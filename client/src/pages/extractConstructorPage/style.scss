@@ -1,0 +1,64 @@
+.form-record {
+    margin-top: 20px;
+
+    .record {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+
+        .record-header {
+            text-align: center;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            h4{
+                margin-left: 42%;
+            }
+            .ant-btn {
+                margin-left: auto;
+            }
+        }
+
+        .record-body {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+
+            .record-body-block{
+                width: 50%;
+                .input-field {
+                    margin-top: 10px;
+                    display: flex;
+                    align-items: center;
+    
+                    label {
+                        text-align: center;
+                        width: 23%;
+                        margin-right: 10px;
+                    }
+    
+                    .ant-input {
+                        flex: 1;
+                    }
+    
+                    .ant-input-number {
+                        flex: 1;
+                    }
+                }
+            }
+        }
+    }
+
+    .action-btns {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.2rem;
+        place-items: center;
+        .ant-btn{
+            width: 50%;
+        }
+    }
+}

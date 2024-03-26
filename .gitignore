@@ -1,0 +1,11 @@
+# Игнорировать временные файлы и директории
+node_modules/
+.DS_Store
+.env
+
+# Игнорировать файлы сборки
+build/
+dist/
+.next/
+.webpack/
+.vscode/

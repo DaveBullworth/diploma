@@ -1,0 +1,79 @@
+.position-constructor-container {
+    margin: 0 auto;
+    padding: 0 20px 12px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+    .position-constructor-title{ 
+        position: relative;
+        .back-icon,
+        .edit-icon {
+            position: absolute; /* Позиционирование иконок абсолютно внутри родительского контейнера */
+            top: 12px; /* Отступ сверху */
+            cursor: pointer; /* Изменение курсора при наведении */
+            z-index: 10; /* Установка z-index для отображения над другими элементами */
+            transition: transform 0.2s ease;
+        }
+
+        .back-icon {
+            left: 10px
+        }
+
+        .edit-icon {
+            right: 10px; /* Отступ справа */
+        }
+        
+        .edit-icon:hover,
+        .back-icon:hover {
+            transform: scale(1.1); /* Увеличиваем размер иконки на 10% при наведении */
+        }
+    }
+
+    h1 {
+        text-align: center;
+        margin: 7px 0 15px 0;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .form-group {
+        width: calc(50% - 10px);
+        margin-bottom: 15px;
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .ant-input, .ant-select {
+            width: 100%;
+        }
+    }
+
+    .form-group.full-width {
+        width: 100%;
+        .ant-btn{
+            width: 100%;
+        }
+    }
+
+    .submit-btn {
+        display: block;
+        width: 100%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            background-color: #0056b3;
+        }
+    }
+}

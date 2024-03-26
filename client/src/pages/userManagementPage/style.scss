@@ -1,0 +1,70 @@
+.current-user {
+    margin-bottom: 20px; /* Добавляем отступ снизу */
+    border: 1px solid #ccc; /* Добавляем рамку */
+    padding: 10px; /* Добавляем внутренний отступ */
+    border-radius: 5px; /* Добавляем скругление углов */
+}
+
+.user-list-header {
+    display: flex;
+    .button-container {
+        margin-left: auto;
+        padding-right: 1.5rem;
+        .ant-btn {
+            background-color: #52c41a; /* Цвет фона кнопки в обычном состоянии */
+            border-color: #52c41a; /* Цвет границы кнопки в обычном состоянии */
+            color: #fff; /* Цвет текста кнопки в обычном состоянии */
+        }
+        .ant-btn:hover {
+            background-color: #74d842; /* Цвет фона кнопки при наведении */
+            border-color: #74d842; /* Цвет границы кнопки при наведении */
+        }
+    }
+}
+
+.ant-list {
+    .user-list-info {
+        display: flex;
+    }
+    
+    .user-list-actions {
+        display: flex; /* Располагаем кнопки в строку */
+        align-items: center; /* Выравниваем кнопки по вертикали */
+    }
+    
+    .user-list-actions > * {
+        margin-left: 5px; /* Добавляем небольшой отступ между кнопками */
+    }
+}
+
+.user-list-info p:nth-child(1) {
+    padding-left: 1rem;
+    width: 10rem; 
+}
+
+.user-list-info p:nth-child(2) {
+    width: 10rem; 
+}
+
+.user-list-info p:nth-child(3) {
+    width: 10rem; 
+}
+
+.edit-modal-content-container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+}
+
+.edit-modal-content-container .ant-form-item {
+    margin-bottom: 10px;
+    .ant-row {
+        .ant-form-item-label{
+            width: 15%;
+            label{
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    }
+}

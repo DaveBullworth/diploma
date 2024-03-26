@@ -1,0 +1,39 @@
+.extract {
+    position: relative; /* Сделать позиционирование иконок относительно родительского контейнера */
+    .back-icon,
+    .edit-icon,
+    .delete-icon {
+        position: absolute; /* Позиционирование иконок абсолютно внутри родительского контейнера */
+        top: 15px; /* Отступ сверху */
+        cursor: pointer; /* Изменение курсора при наведении */
+        z-index: 10; /* Установка z-index для отображения над другими элементами */
+        transition: transform 0.2s ease;
+    }
+    .edit-icon {
+        right: 60px; /* Отступ справа */
+    }
+    .back-icon {
+        left: 20px; /* Отступ слева */
+    }
+    .delete-icon {
+        right: 20px; /* Отступ справа */
+    }
+    .back-icon:hover,
+    .edit-icon:hover,
+    .delete-icon:hover {
+        transform: scale(1.1); /* Увеличиваем размер иконки на 10% при наведении */
+    }
+    .extract-info {
+        .ant-descriptions-title {
+            margin-top: 12px;
+            text-align: center; /* Выравнивание текста по центру */
+            font-size: 24px;
+        }
+        .ant-descriptions-item-content{
+            width: 25%;
+        }
+        .ant-descriptions-item-label {
+            width: 25%;
+        }
+    }
+}

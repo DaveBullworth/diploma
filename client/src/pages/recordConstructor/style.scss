@@ -1,0 +1,48 @@
+.record-constructor-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+
+    .form-group {
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .ant-input,
+        .ant-input-number,
+        .ant-picker {
+            width: 100%;
+        }
+    }
+
+    .ant-divider {
+        grid-column: span 2;
+    }
+}
+
+/* Добавленные стили */
+.buttons-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px 15px 20px;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    .ant-checkbox-wrapper{
+        span{
+            line-height: 28px;
+        }
+    } 
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}

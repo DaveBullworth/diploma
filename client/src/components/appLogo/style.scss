@@ -1,0 +1,40 @@
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  position: relative; /* добавляем для позиционирования псевдоэлемента */
+  line-height: 40px;
+  padding-top: 15px;
+}
+
+.logo-icon {
+  transition: transform 0.3s ease;
+}
+
+.storage {
+  margin-left: 5px;
+  position: relative; /* добавляем для позиционирования псевдоэлемента */
+}
+
+/* Создаем анимацию подчеркивания */
+.storage::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0; /* Начальная ширина подчеркивания */
+  height: 2px; /* Толщина линии подчеркивания */
+  background-color: currentColor; /* Цвет линии подчеркивания */
+  transition: width 0.3s ease; /* Анимация изменения ширины */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Анимация при наведении */
+.logo-container:hover .storage::after {
+  width: 100%; /* Увеличиваем ширину подчеркивания при наведении */
+}
+
+.logo-container:hover .logo-icon {
+  transform: scale(1.2);
+}

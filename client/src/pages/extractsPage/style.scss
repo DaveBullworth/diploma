@@ -1,0 +1,34 @@
+.ant-card-head-title {
+    display: flex!important;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.user-info-card-meta-block-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    .right-allight{
+        display: flex;
+        justify-content: end;
+    }
+}
+
+.search-container-extracts{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0.5rem 0 1rem 0;
+    .label-button{
+        label{
+            font-weight: bold;
+            margin: 0 0 0.5rem 1rem;
+            line-height: 15px;
+        }
+        display: flex;
+        flex-direction: row;
+    }
+    .ant-btn{
+        height: 1.95rem;
+        width: 100%;
+    }
+}

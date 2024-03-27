@@ -51,7 +51,7 @@ const Extract = () => {
     const handleDelete = async (id) => {
         try {
             console.log(`Extract ${id} deleted`)
-            //await deleteExtract(id);
+            //await deleteExtract(id);!!!
         } catch (err) {
             console.error(err);
         } finally {

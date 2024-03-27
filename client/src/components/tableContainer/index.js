@@ -299,9 +299,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     await deleteRecord(id);
                     toDescription = 'запись'
                 case TABLES.EXTRACT:
-                    //
-                case TABLES.EXTRACTRECORD:
-                    //
+                    //await deleteExtract(id)
             }
             fetchData();
             notification({

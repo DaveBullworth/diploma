@@ -1,4 +1,3 @@
-import './style.scss'
 import TableContainer from '../../components/tableContainer'
 import { TABLES } from '../../constants';
 

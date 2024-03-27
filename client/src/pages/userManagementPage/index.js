@@ -110,7 +110,7 @@ const UserManagement = () => {
     ////////////////////////
     
     const handleEditUser = async (user) => {
-        setSelectedUser({ ...user, extracts: [] });//добавь массив extracts[]
+        setSelectedUser({ ...user, extracts: [] });
         setEditedUser({ login: user.login, name: user.name, password: '' });
         setIsRegistration(false);
         setEditModalVisible(true);

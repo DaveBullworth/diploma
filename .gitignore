@@ -9,3 +9,8 @@ dist/
 .next/
 .webpack/
 .vscode/
+
+# Другие файлы
+logo.png
+diplom_diagramBD.drawio
+PERN.webp

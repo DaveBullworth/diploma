@@ -5,7 +5,7 @@ import { Form, Input } from 'antd';
 import { Button, notification } from '../common';
 import { login } from '../../http/userAPI'
 import { useDispatch } from 'react-redux';
-import {setUser} from '../../store/userReducer'; // Замените путь на соответствующий
+import {setUser} from '../../store/userReducer';
 
 const Login = () => {
   const dispatch = useDispatch();

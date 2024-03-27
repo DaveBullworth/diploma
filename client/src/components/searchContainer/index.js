@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Input, Cascader } from 'antd';
-import './style.scss'
 const { Search } = Input;
 
 const SearchContainer = ({ options, onSearch }) => {

@@ -26,9 +26,9 @@ class ExtractController {
                     model: ExtractRecord,
                     as: 'extractRecords'
                 }, {
-                    model: User, // Предположим, что вы импортировали модель User из вашего приложения
-                    attributes: ['login'], // Указываем атрибуты, которые хотим получить из таблицы User
-                    required: true // Добавляем этот параметр, чтобы гарантировать, что будет выполнено соединение INNER JOIN
+                    model: User,
+                    attributes: ['login'],
+                    required: true 
                 }]
             });
             if (!extract) {
@@ -67,9 +67,9 @@ class ExtractController {
                     model: ExtractRecord,
                     as: 'extractRecords'
                 }, {
-                    model: User, // Предположим, что вы импортировали модель User из вашего приложения
-                    attributes: ['login'], // Указываем атрибуты, которые хотим получить из таблицы User
-                    required: true // Добавляем этот параметр, чтобы гарантировать, что будет выполнено соединение INNER JOIN
+                    model: User, 
+                    attributes: ['login'], 
+                    required: true 
                 }],
                 where: whereClause,
                 limit, offset

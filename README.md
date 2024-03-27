@@ -3,7 +3,7 @@ Development of software for optimization of inventory accounting of equipment at
 
 ## Technology Stack
 
-![Alt Text](PERN.webp)
+![Alt Text](https://miro.medium.com/v2/resize:fit:1100/format:webp/1*ptqverAyBpdfUDhrs2g_3A.jpeg)
 
 #### PERN Stack:
 - ***PostgreSQL***

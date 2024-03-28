@@ -14,7 +14,7 @@ import TableContainer from "../../components/tableContainer"
 
 const { Title } = Typography;
 
-const PositionConstructor = () => {
+const PositionConstructor = ({update}) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
@@ -68,14 +68,14 @@ const PositionConstructor = () => {
             const filters = {};
             if (value !== undefined && option !== undefined && value !== null && option !== null) {
                 filters[option] = value;
-                if (id) {
+                if (update) {
                     response = await fetchPositions(pagination.current, pagination.pageSize, filters, null, id);
                 }
                 else {
                     response = await fetchPositions(pagination.current, pagination.pageSize, filters);
                 }
             } else {
-                if (id) {
+                if (update) {
                     response = await fetchPositions(pagination.current, pagination.pageSize, null, null, id);
                 } else {
                     response = await fetchPositions(pagination.current, pagination.pageSize);
@@ -131,7 +131,7 @@ const PositionConstructor = () => {
     useEffect(() => {
         const fetchPositionById = async () => {
             try {
-                if (id) {
+                if (update) {
                     // Выполняем запрос только если id существует
                     const response = await fetchOnePosition(id);
                     // Заполняем inputValues данными из ответа
@@ -196,7 +196,7 @@ const PositionConstructor = () => {
     
             formData.categoryId = foundCategory.id;
     
-            if(id) {
+            if(update) {
                 const editedPosition = await editPosition(id, formData);
 
                 description = `Position ${editedPosition.name} edited successfully!`
@@ -268,7 +268,7 @@ const PositionConstructor = () => {
     return (
         <div className="position-constructor-container">
             <div className="position-constructor-title">
-                { id &&(
+                {update &&(
                     <>
                         <ArrowLeftOutlined 
                             className="back-icon" 
@@ -282,7 +282,7 @@ const PositionConstructor = () => {
                         />
                     </>
                 )}
-                <Title>{id ? `Редактирование позиции ` : 'Создание новой позиции'}<u style={{ color: '#1890ff' }}>{inputValues.name}</u></Title>
+                <Title>{update ? `Редактирование позиции ` : 'Создание новой позиции'}<u style={{ color: '#1890ff' }}>{inputValues.name}</u></Title>
             </div>
             <div className="form-row">
                 <div className="form-group">

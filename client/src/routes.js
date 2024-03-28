@@ -34,7 +34,7 @@ export const routes = [
         },
         {
           path: ROUTES.UPDATE_POSITION,
-          element: <PositionConstructor key={ROUTES.UPDATE_POSITION}/>,
+          element: <PositionConstructor key={ROUTES.UPDATE_POSITION} update={true}/>,
         },
         {
           path: ROUTES.EXTRACTS,

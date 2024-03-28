@@ -11,7 +11,8 @@ export const columns = (
             getColumnSearchProps, 
             filterCategoriesOrUsers,
             sort,
-            getDateSearchProps
+            getDateSearchProps,
+            dataOut
         ) => 
 {
     const columnsPositions = [
@@ -262,19 +263,41 @@ export const columns = (
     return (keyWord) => {
         switch (keyWord) {
             case TABLES.POSITION:
-                return columnsPositions.map(column => {
-                    if (column.key == 'name' 
-                        || column.key == 'desc' 
-                        || column.key == 'article' 
-                        || column.key == 'factory'
-                        || column.key == 'um') {
-                        return {
-                            ...column,
-                            ...getColumnSearchProps(column.dataIndex), 
-                        };
-                    }
-                    return column;
-                });
+                if (!dataOut){
+                    return columnsPositions.map(column => {
+                        if (column.key == 'name' 
+                            || column.key == 'desc' 
+                            || column.key == 'article' 
+                            || column.key == 'factory'
+                            || column.key == 'um') {
+                            return {
+                                ...column,
+                                ...getColumnSearchProps(column.dataIndex), 
+                            };
+                        }
+                        return column;
+                    });
+                } else {
+                    return columnsPositions.map(column => {
+                        if (column.key === 'category') {
+                            // Убираем фильтр из столбца "category"
+                            return {
+                                title: 'Category',
+                                dataIndex: ['category', 'name'], 
+                                key: 'category',
+                            };
+                        }
+                        if (column.key === 'quantity' || column.key === 'shortage') {
+                            // Убираем sorter из столбцов "quantity" и "shortage"
+                            return {
+                                ...column,
+                                sorter: null,
+                                sortOrder: null
+                            };
+                        }
+                        return column;
+                    });
+                }
             case TABLES.RECORD:
                 return columnsRecords.map(column => {
                     if ( column.key == 'desc_fact' || column.key == 'provider' || column.key == 'um') {
@@ -310,6 +333,7 @@ export const columns = (
                         return {
                             ...column,
                             sorter: null,
+                            sortOrder: null
                         };
                     }
                     return column;

@@ -3,7 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Descriptions, Divider } from 'antd';
 import { EditOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Spin, Modal, notification } from '../../components/common/index'
+import { fetchOnePosition, editPosition } from '../../http/positionsAPI';
+import { fetchOneRecord } from '../../http/recordsAPI';
 import { deleteExtract, fetchOneExtract } from '../../http/extractsAPI';
+import { fetchExtractRecords, deleteExtractRecord } from '../../http/extractRecordsAPI';
 import { ROUTES, TABLES } from '../../constants';
 import TableContainer from '../../components/tableContainer';
 import './style.scss'
@@ -12,9 +15,11 @@ const Extract = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [extract, setExtract] = useState(null);
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
         const fetchData = async () => {
             try {
+                setLoading(true)
                 const data = await fetchOneExtract(id);
                 data.date = new Date(data.date).toLocaleString(
                     'en-GB', { 
@@ -29,6 +34,8 @@ const Extract = () => {
                 setExtract(data);
             } catch (error) {
                 console.error('Error fetching extract:', error);
+            } finally{
+                setLoading(false)
             }
         };
     
@@ -50,20 +57,33 @@ const Extract = () => {
     };
     const handleDelete = async (id) => {
         try {
-            console.log(`Extract ${id} deleted`)
-            //await deleteExtract(id);!!!
-        } catch (err) {
-            console.error(err);
-        } finally {
+            setLoading(true)
+            const response1 = await fetchExtractRecords(null, null, id);
+            
+            for (const extract of response1.rows) {
+                const response2 = await fetchOneRecord(extract.recordId);
+                const response3 = await fetchOnePosition(response2.positionId);
+                const newQuantity = response3.quantity + (extract.quantity * response2.quantity_um);
+                await editPosition(response3.id, { quantity: newQuantity });
+                await deleteExtractRecord(extract.id);
+            }
+    
+            await deleteExtract(id);
+            
             notification({
                 type: 'success',
                 message: 'Success!',
-                description: `${extract.id} extract deleted successfully!`,
+                description: `${id} extract deleted successfully!`,
             });
-            navigate(ROUTES.POSITIONS)
+    
+            navigate(ROUTES.EXTRACTS);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false)
         }
     };
-    if (!extract) {
+    if (loading || !extract) {
         return <Spin/>;
     }
     return ( 

@@ -6,8 +6,8 @@ import { fetchPositions, fetchOnePosition, deletePosition, editPosition } from '
 import { fetchRecords, deleteRecord, fetchOneRecord } from '../../http/recordsAPI';
 import { fetchCategorys } from '../../http/categorysAPI';
 import { fetchUsers } from '../../http/userAPI';
-import { fetchExtracts } from '../../http/extractsAPI';
-import { fetchExtractRecords } from '../../http/extractRecordsAPI';
+import { fetchExtracts, deleteExtract } from '../../http/extractsAPI';
+import { fetchExtractRecords, deleteExtractRecord } from '../../http/extractRecordsAPI';
 import { Table, Modal, notification, Button } from '../common/index';
 import { columns } from './config';
 import { ROUTES, TABLES } from '../../constants';
@@ -41,6 +41,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
     useEffect(() => {
         const fetchCategoriesData = async () => {
             try {
+                setLoading(true)
                 const response = await fetchCategorys(); 
                 setCategories(response);
             } catch (error) {
@@ -50,11 +51,14 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     description: 'Failed to fetch categorys!',
                 });
                 console.error('Ошибка при получении категорий:', error);
+            } finally {
+                setLoading(false)
             }
         };
         if(keyWord===TABLES.POSITION)fetchCategoriesData();
         const fetchUsersData = async () => {
             try {
+                setLoading(true)
                 const response = await fetchUsers(); 
                 setUsers(response);
             } catch (error) {
@@ -64,6 +68,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     description: 'Failed to fetch users!',
                 });
                 console.error('Ошибка при получении пользователей:', error);
+            } finally {
+                setLoading(false)
             }
         };
         if(keyWord===TABLES.POSITION)fetchCategoriesData();
@@ -185,6 +191,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     newData = response.rows;
                     total = response.count;
                     break;
+                default:
+                    break; 
             }
             if (newData) {
                 newData = newData.map((item, index) => ({
@@ -258,7 +266,9 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 break;
             case TABLES.EXTRACT:
                 navigate(ROUTES.EXTRACT.replace(':id', id));
-                break;   
+                break; 
+            default:
+                break; 
         }
     };
 
@@ -273,6 +283,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             case TABLES.EXTRACT:
                 navigate(ROUTES.UPDATE_EXTRACT.replace(':id', id));
                 break;
+            default:
+                break; 
         }
     };
 
@@ -281,12 +293,15 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             case TABLES.POSITION:
                 navigate(ROUTES.CREATE_RECORD.replace(':id', id)); // Передача id в маршрут
                 break;
+            default:
+                break; 
         }
     };    
 
     const handleDelete = async (id) => {
         let toDescription = ''
         try {
+            setLoading(true)
             switch (keyWord) {
                 case TABLES.POSITION:
                     await deletePosition(id);
@@ -299,7 +314,18 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     await deleteRecord(id);
                     toDescription = 'запись'
                 case TABLES.EXTRACT:
-                    //await deleteExtract(id)
+                    const response1 = await fetchExtractRecords(null, null, id);
+                    for (const extract of response1.rows) {
+                        const response2 = await fetchOneRecord(extract.recordId);
+                        const response3 = await fetchOnePosition(response2.positionId);
+                        const newQuantity = response3.quantity + (extract.quantity * response2.quantity_um);
+                        await editPosition(response3.id, { quantity: newQuantity });
+                        await deleteExtractRecord(extract.id);
+                    }
+                    await deleteExtract(id);
+                    toDescription = 'выписка'
+                default:
+                    break; 
             }
             fetchData();
             notification({
@@ -314,6 +340,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 message: 'Ошибка',
                 description: `Не удалось удалить ${toDescription}: ${err.message}`,
             });
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -359,10 +387,14 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 const response = await fetchPositions(null, null, filterObjP);
                 positionsIdBuf = response.rows.map(row => row.id);
                 for (const positionId of positionsIdBuf) {
-                    const response = await fetchPositions(null, null, positionId);
+                    const response = await fetchRecords(null, null, positionId);
                     recordsIdBuf2.push(...response.rows.map(row => row.id));
                 }
-                recordsIdBuf = recordsIdBuf1.filter(id => recordsIdBuf2.includes(id));
+                recordsIdBuf = recordsIdBuf2
+                if (("record,um+" in filters && filters["record,um+"] !== "") 
+                || ("record,desc_fact+" in filters && filters["record,desc_fact+"] !== "")){
+                    recordsIdBuf = recordsIdBuf1.filter(id => recordsIdBuf2.includes(id));
+                }
             }
             newFilters = { ...newFilters, recordsId: recordsIdBuf };
         }
@@ -543,7 +575,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         getColumnSearchProps, 
                         filterCategoriesOrUsers,
                         sort,
-                        getDateSearchProps
+                        getDateSearchProps,
+                        dataOut
                         )(keyWord)
                     }
                 dataSource={data}

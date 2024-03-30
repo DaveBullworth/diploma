@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Card, Avatar, Typography, Input, InputNumber, DatePicker, Modal } from 'antd';
-import { WarningTwoTone } from '@ant-design/icons';
+import { Card, Avatar, Typography, Input, InputNumber, DatePicker } from 'antd';
+import { WarningTwoTone, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import { fetchOneUser } from '../../http/userAPI'
 import { fetchPositions, fetchOnePosition, editPosition } from "../../http/positionsAPI"
 import { fetchOneRecord, fetchRecords } from "../../http/recordsAPI"
-import { createExtract, editExtract, fetchOneExtract } from "../../http/extractsAPI"
+import { createExtract, editExtract, fetchOneExtract, deleteExtract } from "../../http/extractsAPI"
 import { createExtractRecord, deleteExtractRecord, fetchExtractRecords } from "../../http/extractRecordsAPI"
-import { Button, Spin, notification } from '../../components/common/index';
+import { Button, Spin, notification, Modal } from '../../components/common/index';
 import { options } from '../../components/searchContainer/config'
-import { TABLES } from '../../constants';
+import { TABLES, ROUTES } from '../../constants';
 import SearchContainer from '../../components/searchContainer';
 import PositionModal from '../../components/modals/PositionModal';
 import RecordModal from '../../components/modals/RecordModal';
@@ -22,6 +22,7 @@ const { Title } = Typography;
 
 const ExtractConstructor = ({update}) => {
     const { id } = useParams(); 
+    const navigate = useNavigate();
     // Определяем минимальную и максимальную даты
     const minDate = dayjs().subtract(5, 'year');
     const maxDate = dayjs().add(1, 'year');
@@ -58,6 +59,46 @@ const ExtractConstructor = ({update}) => {
     const [totalResponse, setTotalResponse] = useState([0,0])
     // Хранение индекса текущего блока поиска
     const [currentSearchBlockIndex, setCurrentSearchBlockIndex] = useState(null); 
+
+    const showConfirm = () => {
+        const content = `Sure to delete: ${id} extract?`;
+        Modal({
+          type: 'confirm',
+          title: 'Confirmation',
+          content,
+          onOk() {
+            handleDelete(id)
+          },
+        });
+    };
+    const handleDelete = async (id) => {
+        try {
+            setLoading(true)
+            const response1 = await fetchExtractRecords(null, null, id);
+            
+            for (const extract of response1.rows) {
+                const response2 = await fetchOneRecord(extract.recordId);
+                const response3 = await fetchOnePosition(response2.positionId);
+                const newQuantity = response3.quantity + (extract.quantity * response2.quantity_um);
+                await editPosition(response3.id, { quantity: newQuantity });
+                await deleteExtractRecord(extract.id);
+            }
+    
+            await deleteExtract(id);
+            
+            notification({
+                type: 'success',
+                message: 'Success!',
+                description: `${id} extract deleted successfully!`,
+            });
+    
+            navigate(ROUTES.EXTRACTS);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false)
+        }
+    };
 
     // Функция для открытия модального окна выбора позиции
     const showPositionModal = () => setPositionModalVisible(true);
@@ -451,7 +492,17 @@ const ExtractConstructor = ({update}) => {
                     <Card title={
                         update ?
                         <span >
+                            <ArrowLeftOutlined 
+                                className="back-icon" 
+                                style={{ color: 'green', fontSize: '28px' }} 
+                                onClick={() => navigate(ROUTES.EXTRACTS)}
+                            />
                             Изменить выписку <strong style={{color: '#1890ff'}}>#{id}</strong> пользователя <u style={{color: '#1890ff'}}>{extractUserInfo}</u> в качестве пользователя
+                            <DeleteOutlined 
+                                className="delete-icon" 
+                                style={{ color: 'red', fontSize: '28px' }} 
+                                onClick={() => showConfirm()} 
+                            />
                         </span>
                         :
                         'Создать новую выписку в качестве пользователя:'}

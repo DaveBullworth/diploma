@@ -158,14 +158,17 @@ const Categories = () => {
                     <>
                         <WarningTwoTone twoToneColor="orange" style={{fontSize:'20px'}} />
                         {' '}
-                        Вы уверены, что хотите изменить название категории "${oldCategoryName}" на "${editedCategory.name}"? Это приведет к изменению ${editedCategory.count} позиций.
+                        Подтвердите изменение названия категории?
                     </>
                 }
                 onOk={handleEditModalOk}
                 open={confirmModalVisible}
                 onCancel={() => setConfirmModalVisible(false)}
-            />
-
+            >
+                <>
+                    Вы уверены, что хотите изменить название категории <b>"{oldCategoryName}"</b> на <b>"{editedCategory.name}"</b>? Это приведет к изменению <b>{editedCategory.count}</b> позиций.
+                </>
+            </Modal>
             {/* Модальное окно для удаления категории */}
             <Modal
                 title={

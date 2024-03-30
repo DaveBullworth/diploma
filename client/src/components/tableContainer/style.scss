@@ -43,23 +43,33 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
-
     display: flex;
-    flex-direction: column;
+    
 
-    label {
-        font-weight: bold;
-        margin-bottom: 5px;
-        padding-right: 10px;
-    }
-
-    div {
+    .info-container{
         display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-
-        span {
-            margin-right: 5px;
+        flex-direction: column;
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            padding-right: 10px;
+        }
+    
+        div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+    
+            span {
+                margin-right: 5px;
+            }
+        }
+    }
+    .info-btn-container{
+        margin: auto 0 auto auto;
+        .ant-btn {
+            height: 3rem;
+            line-height: 1.2rem;
         }
     }
 }

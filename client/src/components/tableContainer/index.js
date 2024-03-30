@@ -32,6 +32,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
     const [users, setUsers] = useState([]);
     const [sort, setSort] = useState({}); 
     const [date, setDate] = useState({ dateA: null, dateB: null });
+    const [displayedFilters, setDisplayedFilters] = useState({});
 
     useEffect(() => {
         setLoading(true);
@@ -202,6 +203,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 setData(newData);
                 setPagination({ ...pagination, total });
             }
+            setDisplayedFilters({...filters})
             setLoading(false);
         } catch (error) {
             setLoading(false);
@@ -306,6 +308,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 case TABLES.POSITION:
                     await deletePosition(id);
                     toDescription = 'позицию'
+                    break
                 case TABLES.RECORD:
                     const record = await fetchOneRecord(id)
                     const position = await fetchOnePosition(record.positionId)
@@ -313,6 +316,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     await editPosition(position.id, {quantity: newQuantity})
                     await deleteRecord(id);
                     toDescription = 'запись'
+                    break
                 case TABLES.EXTRACT:
                     const response1 = await fetchExtractRecords(null, null, id);
                     for (const extract of response1.rows) {
@@ -324,6 +328,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     }
                     await deleteExtract(id);
                     toDescription = 'выписка'
+                    break
                 default:
                     break; 
             }
@@ -562,6 +567,12 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
         }
     };
 
+    const handleResetFilters = () => {
+        setFilters({})
+        setFiltersER({})
+        setSort({})
+    };
+
     return (
         <>
         <Table
@@ -588,34 +599,51 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             />
             {displayInfo && (
                 <div className="table-info">
-                    <div>
-                        <label>Filters:</label>
-                        {Object.entries(filters).map(([key, value]) => (
-                            value && (
-                                <div key={key}>
-                                    {keyWord === TABLES.EXTRACTRECORD 
-                                        ? renderExtractRecordFilter(key, value) 
-                                        : key === 'categoryId' ? 'Category' : key}
+                    <div className='info-container'>
+                        <div className='filter-info-container'>
+                            <label>Filters:</label>
+                            {Object.entries(displayedFilters).map(([key, value]) => (
+                                value && (
+                                    <span key={key}>
+                                        {keyWord === TABLES.EXTRACTRECORD
+                                            ? <u>{renderExtractRecordFilter(key, value)}</u>
+                                            : key === 'categoryId' ? 'Category' : <u>{key}</u>}
                                         : {key === 'categoryId' ? categories.find(cat => cat.id === value)?.name : value}
-                                </div>
-                            )
-                        ))}
-                    </div>
-                    <div>
-                        <label>Sort:</label>
-                        {Object.keys(sort).length > 0 ? (
-                            <div>
-                                {Object.entries(sort).map(([field, order], index) => (
-                                    <span key={field}>
-                                        {field === 'quantity_min' ? 'Недостача' : field}
-                                        : {order === 'ascend' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
-                                        {index !== Object.keys(sort).length - 1 ? ', ' : ''}
                                     </span>
-                                ))}
-                            </div>
-                        ) : (
-                            <></>
-                        )}
+                                )
+                            )).length > 0 && Object.entries(displayedFilters).map(([key, value], index, array) => (
+                                value && (
+                                    <span key={key}>
+                                        {keyWord === TABLES.EXTRACTRECORD
+                                            ? <u>{renderExtractRecordFilter(key, value)}</u>
+                                            : key === 'categoryId' ? <u>Category</u> : <u>{key}</u>}
+                                        : {key === 'categoryId' ? categories.find(cat => cat.id === value)?.name : value}
+                                        {index !== array.length - 1 && ', '}
+                                    </span>
+                                )
+                            ))}
+                        </div>
+                        <div className='sort-info-container'>
+                            <label>Sort:</label>
+                            {Object.keys(sort).length > 0 ? (
+                                <div>
+                                    {Object.entries(sort).map(([field, order], index) => (
+                                        <span key={field}>
+                                            {field === 'quantity_min' ? 'Недостача' : field}
+                                            : {order === 'ascend' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
+                                            {index !== Object.keys(sort).length - 1 ? ', ' : ''}
+                                        </span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <></>
+                            )}
+                        </div>
+                    </div>
+                    <div className='info-btn-container'>
+                        <Button onClick={handleResetFilters}>
+                            Reset<br/>Filters
+                        </Button>
                     </div>
                 </div>
             )}

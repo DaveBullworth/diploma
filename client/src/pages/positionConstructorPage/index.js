@@ -250,6 +250,18 @@ const PositionConstructor = ({update}) => {
                     await createPositionHierarchy({ parentId: newPosition.id, childId: selectedPositionId });
                 }
             }
+            if(!update){
+                setInputValues({
+                    category: '',
+                    name: '',
+                    desc: '',
+                    article: null,
+                    factory: '',
+                    quantity: 0,
+                    um: 'шт.',
+                    quantity_min: 0
+                })
+            }
             notification({
                 type: 'success',
                 message: 'Success!',
@@ -282,7 +294,7 @@ const PositionConstructor = ({update}) => {
                         />
                     </>
                 )}
-                <Title>{update ? `Редактирование позиции ` : 'Создание новой позиции'}<u style={{ color: '#1890ff' }}>{inputValues.name}</u></Title>
+                <Title>{update ? `Редактирование позиции ` : 'Создание новой позиции '}<u style={{ color: '#1890ff' }}>{inputValues.name}</u></Title>
             </div>
             <div className="form-row">
                 <div className="form-group">

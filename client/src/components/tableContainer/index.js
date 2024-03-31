@@ -24,7 +24,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 5, total: 0, hideOnSinglePage:true });
+    const [pagination, setPagination] = useState({ current: 1, pageSize: 5, total: 0, hideOnSinglePage:true, position: ['bottomCenter']});
     const [paginationVisible, setPaginationVisible] = useState(false);
     const [filters, setFilters] = useState({}); // Состояние видимости пагинации
     const [filtersER, setFiltersER] = useState({}); // Состояние видимости пагинации
@@ -33,6 +33,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
     const [sort, setSort] = useState({}); 
     const [date, setDate] = useState({ dateA: null, dateB: null });
     const [displayedFilters, setDisplayedFilters] = useState({});
+    const [prevSorter, setPrevSorter] = useState('init');
 
     useEffect(() => {
         setLoading(true);
@@ -212,6 +213,14 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
     };
 
     const handleTableChange = (pagination, filters, sorter) => {
+        let flag = false
+        console.log('prevSorter: ',prevSorter, 'sorter: ',sorter)
+        if(areObjectsEqual(prevSorter, sorter) || prevSorter==='init' ) flag = true
+        if (
+            (prevSorter?.field === 'quantity' && prevSorter?.columnKey === 'quantity') &&
+            sorter?.field === 'quantity_min' &&
+            sorter?.columnKey === 'shortage'
+        ) flag = true
         // Обработка сортировки
         if (sorter && Array.isArray(sorter)) {
             // Если sorter является массивом, значит, сортировка происходит по нескольким столбцам
@@ -234,6 +243,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 }
             });
             setSort(newSort);
+            setPagination({...pagination, current:1})
         } else if (sorter && sorter.order !== undefined) {
             // Если sorter не является массивом, а является объектом, это означает сортировку только по одному столбцу
             let newSort = { ...sort }; // Создаем копию текущего состояния сортировки
@@ -251,14 +261,17 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     break; // Ничего не делаем для остальных столбцов
             }
             setSort(newSort);
+            setPagination({...pagination, current:1})
         } else {
             // Если order === undefined, удаляем поле, соответствующее сброшенной сортировке
             let newSort = { ...sort };
             delete newSort[sorter.field];
             setSort(newSort);
+            setPagination({...pagination, current:1})
         }
+        setPrevSorter(sorter)
         // Обработка остальных изменений
-        setPagination(pagination);
+        if(flag)setPagination(pagination);
     };           
 
     const handleShow = (id) => {
@@ -446,6 +459,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     <Button
                         onClick={() => {
                             const flag = true;
+                            setPagination({...pagination, current:1})
                             if (filterKey === TABLES.POSITION) {
                                 const { categoryId, ...restFilters } = filters;
                                 setFilters(restFilters);
@@ -464,6 +478,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     <Button
                         type="primary"
                         onClick={() => {
+                            setPagination({...pagination, current:1})
                             fetchData();
                             confirm();
                         }}
@@ -482,6 +497,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
         filterDropdown: ({ setSelectedKeys, confirm }) => (
             <div className="search-container">
                 <Input
+                    type={dataIndex==='article'?'number':'default'}
                     ref={searchInputRef}
                     placeholder={`Search ${dataIndex.includes('-')?dataIndex.replace('-', ''):dataIndex}`}
                     value={filters[dataIndex]}
@@ -496,6 +512,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         } else {
                             fetchData();
                         }
+                        setPagination({...pagination, current:1})
                     }}
                 />
                 <Button
@@ -507,6 +524,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         } else {
                             fetchData();
                         }
+                        setPagination({...pagination, current:1})
                     }}
                     icon={<SearchOutlined />}
                     size="small"
@@ -527,6 +545,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 <DatePicker.RangePicker
                     showTime
                     onChange={(dates) => {
+                        setPagination({...pagination, current:1})
                         if (dates && dates.length === 2) {
                             const [start, end] = dates;
                             setDate({ dateA: start, dateB: end });
@@ -572,6 +591,32 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
         setFiltersER({})
         setSort({})
     };
+
+    function areObjectsEqual(obj1, obj2) {
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+    
+        if (keys1.length !== keys2.length) {
+            return false;
+        }
+    
+        for (const key of keys1) {
+            const val1 = obj1[key];
+            const val2 = obj2[key];
+    
+            // Если свойство объекта - объект, пропускаем его сравнение и переходим к следующему свойству
+            if (typeof val1 === 'object' && typeof val2 === 'object') {
+                continue;
+            }
+    
+            // Сравниваем значения свойств
+            if (val1 !== val2) {
+                return false;
+            }
+        }
+    
+        return true;
+    }     
 
     return (
         <>

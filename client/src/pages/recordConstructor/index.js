@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Input, DatePicker, InputNumber, Divider, Tooltip, Checkbox } from 'antd';
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { ROUTES } from '../../constants';
 import { Button, Spin, notification } from '../../components/common/index';
 import { createRecord, fetchOneRecord, editRecord } from '../../http/recordsAPI';
@@ -162,14 +162,23 @@ const RecordConstructor = ({update}) => {
                 ) : (
                     <>
                         {!update ? (
-                                <Title>Добавление записей для позиции{' '}
-                                    <u style={{ color: '#1890ff' }}>{positionData.name}</u>
-                                </Title>
+                                <div className='title-container-update'>
+                                    <ArrowLeftOutlined 
+                                        className="back-icon" 
+                                        style={{ color: 'green', fontSize: '28px' }} 
+                                        onClick={() => navigate(ROUTES.POSITIONS)}
+                                    />
+                                    <Title>Добавление записей для позиции{' '}
+                                        <u style={{ color: '#1890ff' }}>{positionData.name}</u>
+                                    </Title>
+                                </div>
                             )
                             :(
-                                <Title>Изменение записи{' '}
-                                    <u style={{ color: '#1890ff' }}>№{recordIndex + 1} - {positionData.name}</u>
-                                </Title>
+                                <div className='title-container-create'>
+                                    <Title>Изменение записи{' '}
+                                        <u style={{ color: '#1890ff' }}>№{recordIndex + 1} - {positionData.name}</u>
+                                    </Title>
+                                </div>
                             )
                         }
                         {formDataArray.map((formData, index) => (

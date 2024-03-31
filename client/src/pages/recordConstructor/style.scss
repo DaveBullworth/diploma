@@ -42,7 +42,29 @@
     } 
 }
 
-h1 {
-    text-align: center;
-    margin-top: 20px;
+.title-container-update{
+    .back-icon {
+        position: relative; /* Позиционирование иконок абсолютно внутри родительского контейнера */
+        top: 20px; /* Отступ сверху */
+        left: 30px;
+        cursor: pointer; /* Изменение курсора при наведении */
+        z-index: 10; /* Установка z-index для отображения над другими элементами */
+        transition: transform 0.2s ease;
+    }
+    .back-icon:hover {
+        transform: scale(1.1); /* Увеличиваем размер иконки на 10% при наведении */
+    }
+    h1 {
+        text-align: center;
+        margin-top: -20px;
+    }
+}   
+
+.title-container-create{
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
 }
+
+

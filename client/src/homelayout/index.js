@@ -19,7 +19,7 @@ const HomeLayout = () => {
 
     const location = useLocation();
 
-    const username = useSelector(state => state.user.user.login);
+    const user = useSelector(state => state.user.user);
 
     const getRandomColor = () => {
         const letters = '0123456789ABCDEF';
@@ -42,12 +42,14 @@ const HomeLayout = () => {
                     <AppLogo color={colorWhite} size={26} />
                 </NavLink>
                 <div className="user-info">
-                    <Avatar 
-                        size={33} 
-                        icon={<MehOutlined />}
-                        style={{ backgroundColor: getRandomColor() }}
-                    />
-                    <span className="username">{username}</span>
+                    <Tooltip title={user.name}>
+                        <Avatar 
+                            size={33} 
+                            icon={<MehOutlined />}
+                            style={{ backgroundColor: getRandomColor() }}
+                        />
+                        <span className="username">{user.login}</span>
+                    </Tooltip>
                 <Tooltip title="Log out">
                     <Button
                         shape="circle"

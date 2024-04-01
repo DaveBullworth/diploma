@@ -320,10 +320,15 @@ const ExtractConstructor = ({update}) => {
                     // Получаем информацию о пользователе, создавшем выписку
                     const response2 = await fetchOneUser(response1.userId);
                     // Показываем модальное окно с предупреждением
-                    Modal.confirm({
+                    Modal({
+                        type: 'confirm',
                         title: 'Внимание',
                         icon: <WarningTwoTone twoToneColor="#faad14" />,
-                        content: `Вы хотите изменить выписку, созданную другим пользователем (${response2.name}). Подтверждая, вы присвоите данную выписку себе (${currentUserInfo.name}).`,
+                        content: (
+                            <>
+                                Вы хотите изменить выписку, созданную другим пользователем (<b>{response2.name}</b>). Подтверждая, вы присвоите данную выписку себе (<b>{currentUserInfo.name}</b>).`
+                            </>
+                        ),
                         okText: 'Подтверждаю',
                         cancelText: 'Отмена',
                         onOk: async () => {

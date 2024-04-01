@@ -166,7 +166,7 @@ const RecordConstructor = ({update}) => {
                                     <ArrowLeftOutlined 
                                         className="back-icon" 
                                         style={{ color: 'green', fontSize: '28px' }} 
-                                        onClick={() => navigate(ROUTES.POSITIONS)}
+                                        onClick={() => navigate(ROUTES.POSITION.replace(':id', id))}
                                     />
                                     <Title>Добавление записей для позиции{' '}
                                         <u style={{ color: '#1890ff' }}>{positionData.name}</u>

@@ -2,7 +2,8 @@
     position: relative; /* Сделать позиционирование иконок относительно родительского контейнера */
     .back-icon,
     .edit-icon,
-    .delete-icon {
+    .delete-icon,
+    .form-icon {
         position: absolute; /* Позиционирование иконок абсолютно внутри родительского контейнера */
         top: 15px; /* Отступ сверху */
         cursor: pointer; /* Изменение курсора при наведении */
@@ -18,9 +19,13 @@
     .delete-icon {
         right: 20px; /* Отступ справа */
     }
+    .form-icon{
+        left: 60px;
+    }
     .back-icon:hover,
     .edit-icon:hover,
-    .delete-icon:hover {
+    .delete-icon:hover,
+    .form-icon:hover {
         transform: scale(1.1); /* Увеличиваем размер иконки на 10% при наведении */
     }
     .PositionInfo .ant-descriptions-title {

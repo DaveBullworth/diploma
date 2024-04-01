@@ -214,7 +214,6 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
 
     const handleTableChange = (pagination, filters, sorter) => {
         let flag = false
-        console.log('prevSorter: ',prevSorter, 'sorter: ',sorter)
         if(areObjectsEqual(prevSorter, sorter) || prevSorter==='init' ) flag = true
         if (
             (prevSorter?.field === 'quantity' && prevSorter?.columnKey === 'quantity') &&

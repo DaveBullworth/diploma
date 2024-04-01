@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Descriptions, Divider } from 'antd';
-import { EditOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, FormOutlined } from '@ant-design/icons';
 import { Spin, Modal, notification } from '../../components/common/index'
 import { fetchOnePosition, deletePosition } from '../../http/positionsAPI'
 import TableContainer from '../../components/tableContainer';
@@ -62,6 +62,11 @@ const Position = () => {
                 className="back-icon" 
                 style={{ color: 'green', fontSize: '28px' }} 
                 onClick={() => navigate(ROUTES.POSITIONS)}
+            />
+            <FormOutlined
+                className="form-icon" 
+                style={{ color: 'black', fontSize: '28px' }}
+                onClick={() => navigate(ROUTES.CREATE_RECORD.replace(':id', id))}
             />
             <EditOutlined 
                 className="edit-icon" 

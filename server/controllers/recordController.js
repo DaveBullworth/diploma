@@ -4,10 +4,12 @@ const ApiError = require('../error/apiError')
 
 class RecordController {
     async create(req, res, next) {
+        let token = '';
+        if(req.token) token = req.token;
         try{
             const {desc_fact, quantity, um, quantity_um, provider, date, positionId} = req.body
             const record = await Record.create({desc_fact, quantity, um, quantity_um, provider, date, positionId})
-            return res.json(record)
+            return res.json({record, token})
         } catch (error) {
             next(ApiError.badRequest(error.message))
         }
@@ -61,13 +63,15 @@ class RecordController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке удалить запись)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         try {
             const album = await Record.findByPk(id);
             if (!album) {
                 throw ApiError.badRequest("Record not found");
             }
             await album.destroy();
-            return res.json({ message: 'Record deleted successfully' });
+            return res.json({ message: 'Record deleted successfully', token });
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }
@@ -78,6 +82,8 @@ class RecordController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке изменить запись)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         let {desc_fact, quantity, um, quantity_um, provider, date, positionId} = req.body;
         try {
             const record = await Record.findByPk(id);
@@ -106,7 +112,7 @@ class RecordController {
                 record.positionId = positionId;
             }
             await record.save();
-            return res.json(record);
+            return res.json({record, token});
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }

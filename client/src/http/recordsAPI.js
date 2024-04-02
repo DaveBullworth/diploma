@@ -3,7 +3,8 @@ import { $authHost } from "./index";
 export const createRecord = async (recordData) => {
     try {
         const response = await $authHost.post('api/record', recordData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.record;
     } catch (error) {
         // Обработка ошибок, если необходимо
         console.error("Error creating record:", error);
@@ -38,7 +39,8 @@ export const fetchRecords = async (page, limit, positionId, date, filters) => {
 export const editRecord = async (id, recordData) => {
     try {
         const response = await $authHost.patch(`api/record/${id}`, recordData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.record;
     } catch (error) {
         console.error("Error updating record:", error);
         throw error;
@@ -58,8 +60,8 @@ export const fetchOneRecord = async (id) => {
 export const deleteRecord = async (id) => {
     try {
         const response = await $authHost.delete(`api/record/${id}`);
-        console.log('Response data:', response.data);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.message;
     } catch (error) {
         console.error("Error deleting record:", error);
         throw error;

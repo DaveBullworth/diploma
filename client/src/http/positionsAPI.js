@@ -3,7 +3,8 @@ import { $authHost } from "./index";
 export const createPosition = async (positionData) => {
     try {
         const response = await $authHost.post('api/position', positionData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.position;
     } catch (error) {
         // Обработка ошибок, если необходимо
         console.error("Error creating position:", error);
@@ -41,7 +42,8 @@ export const fetchPositions = async (page, limit, filters, sort, id) => {
 export const editPosition = async (id, positionData) => {
     try {
         const response = await $authHost.patch(`api/position/${id}`, positionData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.position;
     } catch (error) {
         console.error("Error updating position:", error);
         throw error;
@@ -61,8 +63,8 @@ export const fetchOnePosition = async (id) => {
 export const deletePosition = async (id) => {
     try {
         const response = await $authHost.delete(`api/position/${id}`);
-        console.log('Response data:', response.data);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.message;
     } catch (error) {
         console.error("Error deleting position:", error);
         throw error;

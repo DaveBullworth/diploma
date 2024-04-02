@@ -3,7 +3,8 @@ import { $authHost } from "./index";
 export const createExtract = async (extractData) => {
     try {
         const response = await $authHost.post('api/extract/', extractData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.extract;
     } catch (error) {
         // Обработка ошибок, если необходимо
         console.error("Error creating extract:", error);
@@ -36,7 +37,8 @@ export const fetchExtracts = async (page, limit, usersId, date, id) => {
 export const editExtract = async (id, extractData) => {
     try {
         const response = await $authHost.patch(`api/extract/${id}`, extractData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.extract;
     } catch (error) {
         console.error("Error updating extract:", error);
         throw error;
@@ -56,8 +58,8 @@ export const fetchOneExtract = async (id) => {
 export const deleteExtract = async (id) => {
     try {
         const response = await $authHost.delete(`api/extract/${id}`);
-        console.log('Response data:', response.data);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.message;
     } catch (error) {
         console.error("Error deleting extract:", error);
         throw error;

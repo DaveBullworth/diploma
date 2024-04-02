@@ -5,10 +5,12 @@ const ApiError = require('../error/apiError')
 
 class PositionController {
     async create(req, res, next) {
+        let token = '';
+        if(req.token) token = req.token;
         try{
             const {name, desc, article, factory, quantity, um, quantity_min, categoryId} = req.body
             const position = await Position.create({name, desc, article, factory, quantity, um, quantity_min, categoryId})
-            return res.json(position)
+            return res.json({position, token})
         } catch (error) {
             next(ApiError.badRequest(error.message))
         }
@@ -124,13 +126,15 @@ class PositionController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке удалить категорию)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         try {
             const position = await Position.findByPk(id);
             if (!position) {
                 throw ApiError.badRequest("Position not found!");
             }
             await position.destroy();
-            return res.json({ message: 'Position deleted successfully!' });
+            return res.json({ message: 'Position deleted successfully!', token });
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }
@@ -141,6 +145,8 @@ class PositionController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке изменить категорию)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         let {name, desc, article, factory, quantity, um, quantity_min, categoryId} = req.body;
         try {
             const position = await Position.findByPk(id);
@@ -172,7 +178,7 @@ class PositionController {
                 position.categoryId = categoryId;
             }
             await position.save();
-            return res.json(position);
+            return res.json({position, token});
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }

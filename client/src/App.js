@@ -20,6 +20,7 @@ const App = () => {
       } catch (error) {
         dispatch(logout());
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
       } finally {
         setLoading(false);
       }

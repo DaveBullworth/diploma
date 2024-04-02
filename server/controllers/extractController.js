@@ -4,11 +4,13 @@ const ApiError = require('../error/apiError')
 
 class ExtractController {
     async create(req, res, next) {
+        let token = '';
+        if(req.token) token = req.token;
         try{
             const userId = req.body.userId
             const date = req.body.date;
             const extract = await Extract.create({date, userId})
-            return res.json(extract)
+            return res.json({extract, token})
         } catch (error) {
             next(ApiError.badRequest(error.message))
         }
@@ -85,13 +87,15 @@ class ExtractController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке удалить выписку)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         try {
             const extract = await Extract.findByPk(id);
             if (!extract) {
                 throw ApiError.badRequest("Extract not found!");
             }
             await extract.destroy();
-            return res.json({ message: 'Extract deleted successfully!' });
+            return res.json({ message: 'Extract deleted successfully!', token });
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }
@@ -102,6 +106,8 @@ class ExtractController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке изменить выписку)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         let {date, userId} = req.body;
         try {
             const extract = await Extract.findByPk(id);
@@ -115,7 +121,7 @@ class ExtractController {
                 extract.userId = userId;
             }
             await extract.save();
-            return res.json(extract);
+            return res.json({extract, token});
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }

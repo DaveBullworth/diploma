@@ -3,7 +3,8 @@ import { $authHost } from "./index";
 export const createCategory = async (categoryData) => {
     try {
         const response = await $authHost.post('api/category/', categoryData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.category;
     } catch (error) {
         // Обработка ошибок, если необходимо
         console.error("Error creating category:", error);
@@ -24,7 +25,8 @@ export const fetchCategorys = async () => {
 export const editCategory = async (id, categoryData) => {
     try {
         const response = await $authHost.patch(`api/category/${id}`, categoryData);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.category;
     } catch (error) {
         console.error("Error updating category:", error);
         throw error;
@@ -44,8 +46,8 @@ export const fetchOneCategory = async (id) => {
 export const deleteCategory = async (id) => {
     try {
         const response = await $authHost.delete(`api/category/${id}`);
-        console.log('Response data:', response.data);
-        return response.data;
+        if(response.data.token) localStorage.setItem('token', response.data.token)
+        return response.data.message;
     } catch (error) {
         console.error("Error deleting category:", error);
         throw error;

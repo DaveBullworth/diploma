@@ -3,10 +3,12 @@ const ApiError = require('../error/apiError')
 
 class CategoryController {
     async create(req, res, next) {
+        let token = '';
+        if(req.token) token = req.token;
         try{
             const {name} = req.body
             const category = await Category.create({name})
-            return res.json(category)
+            return res.json({category, token})
         } catch (error) {
             next(ApiError.badRequest(error.message))
         }
@@ -43,13 +45,15 @@ class CategoryController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке удалить категорию)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         try {
             const category = await Category.findByPk(id);
             if (!category) {
                 throw ApiError.badRequest("Category not found!");
             }
             await category.destroy();
-            return res.json({ message: 'Category deleted successfully!' });
+            return res.json({ message: 'Category deleted successfully!', token });
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }
@@ -60,6 +64,8 @@ class CategoryController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке изменить категорию)'))
         }
+        let token = '';
+        if(req.token) token = req.token;
         let {name} = req.body;
         try {
             const category = await Category.findByPk(id);
@@ -70,7 +76,7 @@ class CategoryController {
                 category.name = name;
             }
             await category.save();
-            return res.json(category);
+            return res.json({category, token})
         } catch(error) {
             next(ApiError.badRequest(error.message))
         }

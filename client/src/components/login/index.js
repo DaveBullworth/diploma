@@ -13,10 +13,17 @@ const Login = () => {
   const [error, setError] = useState(null);
   useEffect(() => {
     if (error) {
+      let errorMessage = 'An error occurred while logging in';
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       notification({
         type: 'error',
-        message: error.response.data.message,
-        description: error.message,
+        message: 'Ошибка авторизации!',
+        description: errorMessage,
         placement: 'bottomRight',
       });
     }

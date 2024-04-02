@@ -33,6 +33,7 @@ const HomeLayout = () => {
     const logOut = () => {
         dispatch(logout()); // Вызываем экшен logout из userReducer
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
     };
 
     return(

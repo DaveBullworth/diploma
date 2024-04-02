@@ -11,6 +11,7 @@ const { Title } = Typography;
 
 const UserManagement = () => {
     // Получение данных о текущем пользователе из Redux store
+    const usersPerPage = 4;
     const currentUserId = useSelector(state => state.user.user.id);
     const [currentUserInfo, setCurrentUserInfo] = useState({})
     const fetchCurrentUserInfo = async () => {
@@ -49,7 +50,6 @@ const UserManagement = () => {
     // Функция для загрузки пользователей с сервера
     const fetchUsersInfo = async () => {
         // количество пользователей на 1 странице
-        const usersPerPage = 3;
         try {
             // Вычисляем индекс первого пользователя на текущей странице
             const indexOfLastUser = currentPage * usersPerPage;
@@ -139,6 +139,7 @@ const UserManagement = () => {
                         await registration(editedUserData);
                     } else {
                         await editUser(selectedUser.id, editedUserData);
+                        
                     }
                     fetchUsersInfo();
                     notification({
@@ -147,11 +148,17 @@ const UserManagement = () => {
                         description: `User ${isRegistration ? editedUser.login : selectedUser.login } ${isRegistration ? 'registered' : 'edited'} successfully!`,
                     });
                 } catch (error) {
+                    let errorMessage = 'An error occurred while register';
+                    if (error.response && error.response.data && error.response.data.message) {
+                      errorMessage = error.response.data.message;
+                    } else if (error.message) {
+                      errorMessage = error.message;
+                    }
                     console.error('Error editing user:', error);
                     notification({
                         type: 'error',
-                        message: 'Error!',
-                        description: `Failed to ${isRegistration ? 'register' : 'edit'} ${isRegistration ? editedUser.login : selectedUser.login } user!`,
+                        message: `Failed to ${isRegistration ? 'register' : 'edit'} ${isRegistration ? editedUser.login : selectedUser.login } user!`,
+                        description: errorMessage
                     });
                 }
             },
@@ -210,7 +217,7 @@ const UserManagement = () => {
             <Pagination 
                 current={currentPage} // Указываем текущую страницу
                 total={usersCount} // Указываем общее количество пользователей
-                pageSize={users.length} // Указываем количество пользователей на странице
+                pageSize={usersPerPage} // Указываем количество пользователей на странице
                 onChange={handlePageChange} // Обработчик изменения страницы
                 style={{marginTop: '20px', textAlign: 'center'}} // Дополнительные стили
                 hideOnSinglePage

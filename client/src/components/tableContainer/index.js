@@ -496,7 +496,6 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
         filterDropdown: ({ setSelectedKeys, confirm }) => (
             <div className="search-container">
                 <Input
-                    type={dataIndex==='article'?'number':'default'}
                     ref={searchInputRef}
                     placeholder={`Search ${dataIndex.includes('-')?dataIndex.replace('-', ''):dataIndex}`}
                     value={filters[dataIndex]}

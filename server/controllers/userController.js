@@ -5,18 +5,21 @@ const {User, Extract} = require('../models/models')
 
 class UserController {
     async registration(req, res, next) {
-        const {login, password, name} = req.body
+        const {login, password, name, active, admin} = req.body
         let token = '';
         if(req.token) token = req.token;
         if (!login || !password) {
             return next(ApiError.badRequest('Неккоректный логин/пароль!'))
+        }
+        if (!req.user.admin) {
+            return next(ApiError.forbidden('У вас нет прав на выполнение этой операции!'));
         }
         const candidate = await User.findOne({where:{login}})
         if (candidate){
             return next(ApiError.badRequest('Пользователь уже существует!'))
         }
         const hashPassword = await bcrypt.hash(password,3)
-        const user = await User.create({login, password:hashPassword, name})
+        const user = await User.create({login, password:hashPassword, name, active, admin})
         return res.json({ user, token });
     }
 
@@ -27,13 +30,17 @@ class UserController {
             if (!candidate){
                 return next(ApiError.badRequest('Пользователь не существует!'))
             }
+            // Проверяем активность пользователя
+            if (!candidate.active) {
+                return next(ApiError.forbidden('Данный пользователь деактивирован!'));
+            }
             let comparePassword = bcrypt.compareSync(password, candidate.password)
             if(!comparePassword){
                 return next(ApiError.internal('Неверный пароль!'))
             }
             // Генерируем новые токены при успешном входе
-            const token = generateJWT(candidate.id, candidate.login, candidate.name);
-            const refreshToken = generateRefreshToken(candidate.id, candidate.login, candidate.name);
+            const token = generateJWT(candidate.id, candidate.login, candidate.name, candidate.active, candidate.admin);
+            const refreshToken = generateRefreshToken(candidate.id, candidate.login, candidate.name, candidate.active, candidate.admin);
             return res.json({token, refreshToken});
         } catch (error) {
             return next(ApiError.internal('Ошибка при входе!'));
@@ -41,8 +48,8 @@ class UserController {
     }    
 
     async check(req, res, next) {
-        const {id, login, name} = req.user
-        const token = generateJWT(id, login, name)
+        const {id, login, name, active, admin} = req.user
+        const token = generateJWT(id, login, name, active, admin)
         return res.json({token})
     }
 
@@ -59,7 +66,7 @@ class UserController {
                 throw { message: 'Пользователь не найден!' };
             }
             // Создаем новый access-токен
-            const accessToken = generateJWT(user.id, user.login, user.name);
+            const accessToken = generateJWT(user.id, user.login, user.name, user.active, user.admin);
             // Создаем новый refresh-токен (опционально)
             //const newRefreshToken = generateRefreshToken(user.id, user.login, user.name);
             return ({ token: accessToken });
@@ -97,6 +104,9 @@ class UserController {
         let token = '';
         if(req.token) token = req.token;
         try {
+            if (!req.user.admin) {
+                return next(ApiError.forbidden('У вас нет прав на выполнение этой операции!'));
+            }
             const user = await User.findByPk(id);
             if (!user) {
                 throw ApiError.badRequest("User not found!");
@@ -115,8 +125,11 @@ class UserController {
         }
         let token = '';
         if(req.token) token = req.token;
-        let {name, login, password} = req.body;
+        let {name, login, password, active, admin} = req.body;
         try {
+            if (!req.user.admin) {
+                return next(ApiError.forbidden('У вас нет прав на выполнение этой операции!'));
+            }
             const user = await User.findByPk(id);
             if (!user) {
                 throw ApiError.badRequest("User Not Found!");
@@ -131,6 +144,12 @@ class UserController {
                 // Хешируем новый пароль перед сохранением
                 const hashPassword = await bcrypt.hash(password, 3);
                 user.password = hashPassword;
+            }
+            if (active !== undefined) {
+                user.active = active
+            }
+            if (admin !== undefined) {
+                user.admin = admin
             }
             await user.save();
             return res.json({ user, token });
@@ -154,17 +173,17 @@ class UserController {
     }    
 }
 
-const generateJWT = (id, login, name) => {
+const generateJWT = (id, login, name, active, admin) => {
     return jwt.sign(
-        {id, login, name}, 
+        {id, login, name, active, admin}, 
         process.env.ACCESS_TOKEN_SECRET,
         {expiresIn: '15m'}
     )
 }
 
-const generateRefreshToken = (id, login, name) => {
+const generateRefreshToken = (id, login, name, active, admin) => {
     return jwt.sign(
-        { id, login, name },
+        { id, login, name, active, admin },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '2d' } 
     );

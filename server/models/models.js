@@ -6,7 +6,9 @@ const User = sequelize.define('user', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     login: {type: DataTypes.STRING, unique:true, allowNull:false},
     password: {type: DataTypes.STRING, allowNull:false},
-    name: {type: DataTypes.STRING, allowNull:false}
+    name: {type: DataTypes.STRING, allowNull:false},
+    active: {type: DataTypes.BOOLEAN, allowNull:false, defaultValue: true}, // добавлено поле active
+    admin: {type: DataTypes.BOOLEAN, allowNull:false, defaultValue: false} // добавлено поле admin
 })
 
 //выписка
@@ -33,7 +35,7 @@ const Position = sequelize.define('position', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, unique:true, allowNull:false}, 
     desc:  {type: DataTypes.STRING, allowNull:true},
-    article: {type:DataTypes.INTEGER, unique:true},
+    article: {type: DataTypes.STRING, unique:true}, // изменен тип поля article на строковый
     factory: {type: DataTypes.STRING, allowNull:true},
     quantity: {type:DataTypes.INTEGER, defaultValue: 0},
     um: {type: DataTypes.STRING, defaultValue: "шт.", allowNull:false},

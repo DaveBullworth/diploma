@@ -67,7 +67,7 @@ class PositionController {
             if (filters) {
                 filters = JSON.parse(filters); // Парсим строку JSON
                 for (let key in filters) {
-                    if (key === 'article' || key === 'categoryId') {
+                    if (key === 'categoryId') {
                         whereClause[key] = { [Op.eq]: filters[key] };
                     } else {
                         whereClause[key] = { [Op.like]: `%${filters[key]}%` };

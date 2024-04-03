@@ -334,7 +334,6 @@ const PositionConstructor = ({update}) => {
                 <div className="form-group">
                     <label>Артикул:</label>
                     <Input 
-                        type="number" 
                         placeholder="Введите артикул" 
                         value={inputValues.article} 
                         onChange={e => handleInputChange('article', e.target.value)} 

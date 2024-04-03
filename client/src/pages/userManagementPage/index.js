@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { EditOutlined, DeleteOutlined, UserAddOutlined, WarningTwoTone, StopTwoTone } from '@ant-design/icons';
+import { 
+    EditOutlined, UserAddOutlined, 
+    WarningTwoTone, StopTwoTone,
+    StopOutlined, UserOutlined, 
+    CrownTwoTone, CloseOutlined,
+    CheckOutlined, CrownOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { fetchUsers, fetchOneUser, editUser, deleteUser, registration } from '../../http/userAPI'
-import { List, Card, Avatar, Typography, Pagination, Modal, Input, Form } from 'antd';
+import { List, Card, Avatar, Typography, Pagination, Modal, Input, Form, Checkbox } from 'antd';
 import { Button, notification } from '../../components/common/index';
 import './style.scss'
 const { Meta } = Card;
@@ -13,6 +18,7 @@ const UserManagement = () => {
     // Получение данных о текущем пользователе из Redux store
     const usersPerPage = 4;
     const currentUserId = useSelector(state => state.user.user.id);
+    const isAdmin = useSelector(state => state.user.user.admin);
     const [currentUserInfo, setCurrentUserInfo] = useState({})
     const fetchCurrentUserInfo = async () => {
         try {
@@ -39,7 +45,7 @@ const UserManagement = () => {
     const [modalVisible, setModalVisible] = useState(false); // Состояние для отображения модального окна
 
     const [editModalVisible, setEditModalVisible] = useState(false); // Состояние для отображения модального окна редактирования
-    const [editedUser, setEditedUser] = useState({ login: '', name: '', password: '' }); // Состояние для данных редактируемого пользователя
+    const [editedUser, setEditedUser] = useState({ login: '', name: '', password: '', active: false, admin: false }); // Состояние для данных редактируемого пользователя
 
     const [isRegistration, setIsRegistration] = useState(false);
 
@@ -82,9 +88,13 @@ const UserManagement = () => {
         }
     };
 
-    const handleConfirmDelete = async () => {
+    const handleConfirmDelete = async (flag) => {
         try {
-            await deleteUser(selectedUser.id);
+            if (flag) {
+                await deleteUser(selectedUser.id);
+            } else {
+                await editUser(selectedUser.id, { active: false });
+            }
             setModalVisible(false);
             // После успешного удаления обновляем список пользователей
             fetchUsersInfo();
@@ -111,14 +121,14 @@ const UserManagement = () => {
     
     const handleEditUser = async (user) => {
         setSelectedUser({ ...user, extracts: [] });
-        setEditedUser({ login: user.login, name: user.name, password: '' });
+        setEditedUser({ login: user.login, name: user.name, password: '', active: user.active, admin: user.admin });
         setIsRegistration(false);
         setEditModalVisible(true);
     };
 
     const handleRegistration = () => {
         setIsRegistration(true); // Устанавливаем флаг регистрации в true
-        setEditedUser({ login: '', name: '', password: '' }); // Очищаем данные редактируемого пользователя
+        setEditedUser({ login: '', name: '', password: '', active: true, admin: false }); // Очищаем данные редактируемого пользователя
         setEditModalVisible(true); // Показываем модальное окно
     };
 
@@ -175,11 +185,42 @@ const UserManagement = () => {
     return ( 
         <div>
             {/* Данные о текущем пользователе */}
-            <Card title='Данные авторизованного пользователя:'>    
+            <Card 
+                title='Данные авторизованного пользователя:'
+            >    
                 <Meta
                     avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
-                    title={<><u style={{color: '#1890ff'}}>Login:</u><span style={{ marginLeft: '20px' }}>{currentUserInfo.login}</span></>}
-                    description={<><u style={{color: '#1890ff'}}>Name:</u><span style={{ marginLeft: '20px' }}>{currentUserInfo.name}</span></>}
+                                        title={
+                        <div className='user-info-card-meta-block-container'>
+                            <div>
+                                <u style={{color: '#1890ff'}}>Login:</u>
+                                <span style={{marginLeft:'20px'}}>{currentUserInfo.login}</span>
+                            </div>
+                            <div className='right-allight'>
+                                <u style={{color: '#1890ff', marginRight:'38px'}}>ID:</u>
+                                <span style={{marginRight:'28px'}}>{currentUserInfo.id}</span>
+                            </div>
+                        </div>
+                    }
+                    description={
+                        <div className='user-info-card-meta-block-container'>
+                            <div>
+                                <u style={{color: '#1890ff'}}>Name:</u>
+                                <span style={{marginLeft:'20px'}}>{currentUserInfo.name}</span>
+                            </div>
+                            <div className='right-allight'>
+                                <u style={{color: '#1890ff', marginRight:'30px'}}>
+                                    {currentUserInfo.admin ? 'Admin:' : 'User:'}
+                                </u>
+                                <span style={{marginRight:'20px'}}>
+                                    {currentUserInfo.admin ?
+                                        <CrownTwoTone twoToneColor="#FFD700" style={{fontSize: '22px'}} /> :
+                                        <UserOutlined style={{fontSize: '22px'}}/>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    }
                 />
             </Card>
             <Title>Панель управления пользователями</Title>
@@ -187,29 +228,44 @@ const UserManagement = () => {
                 header={
                     <div className='user-list-header'>
                         <div className='user-list-info'>
-                            <p><b>#</b></p>
-                            <p style={{width:'9.8rem'}}><b>ID</b></p>
+                            <p style={{width:'7rem'}}><b>#</b></p>
+                            <p style={{width:'8rem', fontSize:'inherit'}}><b>Active</b></p>
+                            <p style={{width:'9.8rem', fontSize:'inherit'}}><b>Admin</b></p>
                             <p style={{width:'13rem'}}><b>Login</b></p>
                             <p><b>Name</b></p>
                         </div>
                         <div className='button-container'>
-                            <Button icon={<UserAddOutlined />} onClick={handleRegistration}/>
+                            {isAdmin ? (
+                                <Button icon={<UserAddOutlined />} onClick={handleRegistration}/>
+                            ):(
+                                <span>доступ к добавлению/изменению пользователей только у админов</span>
+                            )}
                         </div>
                     </div>
                 }
                 bordered
                 dataSource={users}
                 renderItem={(item, index) => (
-                    <List.Item>
+                    <List.Item 
+                        className={`
+                            ${!item.active ? 'inactive-user' : ''} 
+                            ${item.admin ? 'admin-user' : ''}
+                        `}
+                    >
                         <div className="user-list-info">
                             <p><b>{index + 1}</b></p>
-                            <p>{item.id}</p>
+                            <p>{item.active ? <CheckOutlined /> : <CloseOutlined />}</p>
+                            <p>{item.admin ? <CrownOutlined /> : <UserOutlined />}</p>
                             <p>{item.login}</p>
                             <p>{item.name}</p>
                         </div>
                         <div className="user-list-actions">
-                            <Button icon={<EditOutlined />} onClick={() => handleEditUser(item)}/>
-                            <Button danger icon={<DeleteOutlined />} onClick={() => handleDeleteUser(item)}/>
+                            {isAdmin && (
+                                <>
+                                    <Button icon={<EditOutlined />} onClick={() => handleEditUser(item)}/>
+                                    <Button danger icon={<StopOutlined />} onClick={() => handleDeleteUser(item)}/>
+                                </>
+                            )}
                         </div>
                     </List.Item>
                 )}
@@ -222,34 +278,67 @@ const UserManagement = () => {
                 style={{marginTop: '20px', textAlign: 'center'}} // Дополнительные стили
                 hideOnSinglePage
             />
-            {/* Модальное окно для подтверждения удаления пользователя */}
             <Modal
                 title={
                     <>
-                      {(selectedUser?.extracts.length === 0 ? (
+                    {(selectedUser?.extracts.length === 0 ? (
                         <WarningTwoTone 
                             twoToneColor="orange" 
                             style={{fontSize:'20px'}}
                         />
-                      ) : (
+                    ) : (
                         <StopTwoTone 
                             twoToneColor="red" 
                             style={{fontSize:'20px'}}
                         />
-                      ))}
+                    ))}
                         {' '}Удаление пользователя{' '} 
                         <u>{selectedUser ? selectedUser.login : ''}</u>
                     </>
                 }
                 open={modalVisible}
-                onOk={handleConfirmDelete}
                 onCancel={handleCancelDelete}
-                okButtonProps={{ disabled: selectedUser && selectedUser.extracts.length > 0 }}
+                footer={[
+                    selectedUser && selectedUser.extracts.length === 0 ? (
+                        <>
+                            <Button 
+                                key="delete" 
+                                danger 
+                                onClick={() => handleConfirmDelete(true)} 
+                                text="Удалить"
+                            />
+                            <Button 
+                                key="deactivate" 
+                                danger 
+                                type="default" 
+                                onClick={() => handleConfirmDelete(false)} 
+                                text="Деактивировать"
+                            />
+                        </>
+                    ) : (
+                        <Button 
+                            key="deactivate" 
+                            type="primary" 
+                            onClick={() => handleConfirmDelete(false)} 
+                            text="Деактивировать"
+                        />
+                    ),
+                    <Button key="cancel" onClick={handleCancelDelete} text="Отмена"/>
+                ]}
             >
                 {selectedUser && selectedUser.extracts.length === 0 ? (
-                    <p>Вы уверены, что хотите удалить пользователя <b>{selectedUser.login}</b>?</p>
+                    <p>
+                        Вы уверены, что хотите удалить пользователя <b>{selectedUser.login}</b>?
+                        Возможна деактивация пользователя без удаления!
+                    </p>
                 ) : (
-                    <p>Удаление данного пользователя невозможно, так как у него есть выписки <b>({selectedUser ? selectedUser.extracts.length : 0})</b>. Перед удалением пользователя необходимо удалить/изменить данные выписки.</p>
+                    <p>
+                        Удаление данного пользователя невозможно,
+                        так как у него есть выписки 
+                        <b>({selectedUser ? selectedUser.extracts.length : 0})</b>
+                        . Перед удалением пользователя необходимо удалить/изменить данные выписки.
+                        Возможна только деактивация пользователя. Деактивировать?
+                    </p>
                 )}
             </Modal>
             {/* Модальное окно для редактирования/регистрации пользователя */}
@@ -292,6 +381,22 @@ const UserManagement = () => {
                             onChange={(e) => setEditedUser({ ...editedUser, password: e.target.value })}
                             
                         />
+                    </Form.Item>
+                    <Form.Item label="Active">
+                        <Checkbox
+                            checked={editedUser.active}
+                            onChange={(e) => setEditedUser({ ...editedUser, active: e.target.checked })}
+                        >
+                            Активен
+                        </Checkbox>
+                    </Form.Item>
+                    <Form.Item label="Admin">
+                        <Checkbox
+                            checked={editedUser.admin}
+                            onChange={(e) => setEditedUser({ ...editedUser, admin: e.target.checked })}
+                        >
+                            Админ
+                        </Checkbox>
                     </Form.Item>
                 </Form>
             </Modal>

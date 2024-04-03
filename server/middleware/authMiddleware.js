@@ -13,6 +13,9 @@ module.exports = async function (req, res, next) {
         
         try {
             const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            if (!decoded.active) {
+                return res.status(403).json({message: "Данный пользователь деактивирован!"});
+            }
             req.user = decoded;
             next();
         } catch (error) {
@@ -24,6 +27,9 @@ module.exports = async function (req, res, next) {
                     req.headers.authorization = `Bearer ${refreshedResponse.token}`;
                     // Повторно попробуйте верифицировать новый access-токен
                     const newDecoded = jwt.verify(refreshedResponse.token, process.env.ACCESS_TOKEN_SECRET);
+                    if (!newDecoded.active) {
+                        return res.status(403).json({message: "Данный пользователь деактивирован!"});
+                    }
                     req.user = newDecoded;
                     req.token = refreshedResponse.token;
                     next();

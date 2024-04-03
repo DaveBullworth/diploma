@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Layout, Menu, Tooltip, Avatar, theme } from 'antd';
-import { LogoutOutlined, MehOutlined } from '@ant-design/icons';
+import { LogoutOutlined, CrownOutlined, UserOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/userReducer'; // Импортируем logout из userReducer
 import Button from '../components/common/Button';
@@ -46,7 +46,7 @@ const HomeLayout = () => {
                     <Tooltip title={user.name}>
                         <Avatar 
                             size={33} 
-                            icon={<MehOutlined />}
+                            icon={user.admin ? <CrownOutlined/> : <UserOutlined/>}
                             style={{ backgroundColor: getRandomColor() }}
                         />
                         <span className="username">{user.login}</span>

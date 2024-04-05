@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Typography, Input, DatePicker, InputNumber, Divider, Tooltip, Checkbox } from 'antd';
 import { CloseCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { ROUTES } from '../../constants';
@@ -13,6 +14,7 @@ const { Title } = Typography;
 
 const RecordConstructor = ({update}) => {
     const { id } = useParams(); // id позиции для которой создаются записи
+    const { t } = useTranslation();
     const navigate = useNavigate();
     // Определяем минимальную и максимальную даты
     const minDate = dayjs().subtract(5, 'year');
@@ -100,15 +102,15 @@ const RecordConstructor = ({update}) => {
             }]);
             notification({
                 type: 'success',
-                message: 'Success!',
-                description: 'New records added successfully!',
+                message: t("notification.success"),
+                description: t("notification.successDesc4"),
             });
         } catch (error) {
             console.error('Ошибка при отправке записи:', error);
             notification({
                 type: 'error',
-                message: 'Error!',
-                description: 'Failed to add new records!',
+                message: t("notification.error"),
+                description: t("notification.errorDesc6"),
             });
         } finally {
             setLoading(false)
@@ -144,8 +146,8 @@ const RecordConstructor = ({update}) => {
                 console.error('Ошибка при получении данных:', error);
                 notification({
                     type: 'error',
-                    message: 'Error!',
-                    description: 'Failed to fetch data!',
+                    message: t("notification.error"),
+                    description: t("notification.errorDesc7"),
                 });
             } finally {
                 setLoading(false)
@@ -168,14 +170,14 @@ const RecordConstructor = ({update}) => {
                                         style={{ color: 'green', fontSize: '28px' }} 
                                         onClick={() => navigate(ROUTES.POSITION.replace(':id', id))}
                                     />
-                                    <Title>Добавление записей для позиции{' '}
+                                    <Title>{t("recordConstructor.titleNew")}{' '}
                                         <u style={{ color: '#1890ff' }}>{positionData.name}</u>
                                     </Title>
                                 </div>
                             )
                             :(
                                 <div className='title-container-create'>
-                                    <Title>Изменение записи{' '}
+                                    <Title>{t("recordConstructor.titleUpdate")}{' '}
                                         <u style={{ color: '#1890ff' }}>№{recordIndex + 1} - {positionData.name}</u>
                                     </Title>
                                 </div>
@@ -184,16 +186,16 @@ const RecordConstructor = ({update}) => {
                         {formDataArray.map((formData, index) => (
                             <div className="record-constructor-container" key={index}>
                                 <div className="form-group">
-                                    <label>Описание с завода:</label>
+                                    <label>{t("recordConstructor.desc_fact")}:</label>
                                     <Input.TextArea 
-                                        placeholder="Введите описание с завода" 
+                                        placeholder={t("positionConstructor.enter") + " " + t("recordConstructor.desc_fact_")}
                                         value={formData.desc_fact} 
                                         onChange={e => handleInputChange(index, 'desc_fact', e.target.value)} 
                                         style={{ height: '20px' }}
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Поступившее количество:</label>
+                                    <label>{t("recordConstructor.quantity")}:</label>
                                     <InputNumber
                                         type='number'
                                         value={formData.quantity}
@@ -201,15 +203,15 @@ const RecordConstructor = ({update}) => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Единица измерения:</label>
+                                    <label>{t("recordConstructor.um")}:</label>
                                     <Input 
-                                        placeholder="Введите единицу измерения" 
+                                        placeholder={t("positionConstructor.enter") + " " + t("recordConstructor.um_")}
                                         value={formData.um} 
                                         onChange={e => handleInputChange(index, 'um', e.target.value)} 
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Множитель (количество единиц измерения):</label>
+                                    <label>{t("recordConstructor.quantity_um")}:</label>
                                     <InputNumber
                                         type='number'
                                         value={formData.quantity_um}
@@ -217,16 +219,16 @@ const RecordConstructor = ({update}) => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Поставщик:</label>
+                                    <label>{t("recordConstructor.provider")}:</label>
                                     <Input.TextArea 
-                                        placeholder="Введите поставщика" 
+                                        placeholder={t("positionConstructor.enter") + " " + t("recordConstructor.provider_")}
                                         value={formData.provider} 
                                         onChange={e => handleInputChange(index, 'provider', e.target.value)} 
                                         style={{ height: '20px' }}
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Дата поставки:</label>
+                                    <label>{t("recordConstructor.date")}:</label>
                                     <DatePicker
                                         showTime
                                         format="YYYY-MM-DD HH:mm:ss"
@@ -238,8 +240,8 @@ const RecordConstructor = ({update}) => {
                                 </div>
                                 {!update ?(
                                     <Divider>
-                                        Порядковый номер добавляемой записи: <b style={{ color: '#1890ff' }}>{index + 1}</b>
-                                        <Tooltip title='Убрать запись'>
+                                        {t("recordConstructor.recordNum")}: <b style={{ color: '#1890ff' }}>{index + 1}</b>
+                                        <Tooltip title={t("recordConstructor.remRec")}>
                                             <Button 
                                                 type="danger" 
                                                 icon={<CloseCircleOutlined  style={{ color: 'red', fontSize: '18px' }}/>}
@@ -249,16 +251,16 @@ const RecordConstructor = ({update}) => {
                                     </Divider>
                                 ):(
                                     <>
-                                    <Button type='default' onClick={handleBack} text='Вернуться к позиции'/>
-                                    <Button type="primary" onClick={handleSubmit} text='Сохранить'/>
+                                    <Button type='default' onClick={handleBack} text={t("recordConstructor.backToPos")}/>
+                                    <Button type="primary" onClick={handleSubmit} text={t("positionConstructor.save")}/>
                                     </>
                                 )}
                             </div>
                         ))}
                         {!update &&(<div className="buttons-container">
-                            <Button type='default' onClick={addNewRecord} text='Ещё запись' />
-                            <Checkbox checked={copyFromPrevious} onChange={(e) => setCopyFromPrevious(e.target.checked)}>скопировать предыдущую</Checkbox> 
-                            <Button type="primary" onClick={handleSubmit} text='Сохранить' />
+                            <Button type='default' onClick={addNewRecord} text={t("recordConstructor.addRec")} />
+                            <Checkbox checked={copyFromPrevious} onChange={(e) => setCopyFromPrevious(e.target.checked)}>{t("recordConstructor.copy")}</Checkbox> 
+                            <Button type="primary" onClick={handleSubmit} text={t("positionConstructor.save")} />
                         </div>)}
                     </>
                 )

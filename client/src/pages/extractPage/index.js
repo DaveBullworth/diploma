@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Descriptions, Divider } from 'antd';
 import { EditOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Spin, Modal, notification } from '../../components/common/index'
@@ -13,6 +14,7 @@ import './style.scss'
 
 const Extract = () => {
     const { id } = useParams();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [extract, setExtract] = useState(null);
     const [loading, setLoading] = useState(false)
@@ -45,7 +47,7 @@ const Extract = () => {
         navigate(ROUTES.UPDATE_EXTRACT.replace(':id', id));
     }
     const showConfirm = () => {
-        const content = `Sure to delete: ${extract.id} extract?`;
+        const content = `${t("modal.sureDel")}: ${extract.id} ${t("extractPage.extract")}?`;
         Modal({
           type: 'confirm',
           title: 'Confirmation',
@@ -72,8 +74,8 @@ const Extract = () => {
             
             notification({
                 type: 'success',
-                message: 'Success!',
-                description: `${id} extract deleted successfully!`,
+                message: t("notification.success"),
+                description: `${id} ${t("extractPage.extract")} ${t("notification.successDesc3")}!`,
             });
     
             navigate(ROUTES.EXTRACTS);
@@ -106,7 +108,7 @@ const Extract = () => {
             <Descriptions 
                 title={
                     <span>
-                        Extract <u style={{ color: '#1890ff' }}>#{extract.id}</u> Info:
+                        {t("positionPage.info_")} {t("extractPage._extract")} {t("positionPage._info")}{t("extractPage.extract__")}: <u style={{ color: '#1890ff' }}>#{extract.id}</u>
                     </span>
                 } 
                 bordered 
@@ -115,13 +117,13 @@ const Extract = () => {
                 layout="horizontal"
             >
                 <Descriptions.Item label="ID #">{extract.id}</Descriptions.Item>
-                <Descriptions.Item label="DATE">{extract.date}</Descriptions.Item>
-                <Descriptions.Item label="Created by">{extract.user.login}</Descriptions.Item>
-                <Descriptions.Item label="N-O Records">{extract.extractRecords.length}</Descriptions.Item>
+                <Descriptions.Item label={t("table-columns.date") + ':'}>{extract.date}</Descriptions.Item>
+                <Descriptions.Item label={t("extractPage.created") + ':'}>{extract.user.login}</Descriptions.Item>
+                <Descriptions.Item label={t("extractPage.recNO") + ':'}>{extract.extractRecords.length}</Descriptions.Item>
             </Descriptions>
             {extract.extractRecords.length > 0 && (            
                 <>
-                    <Divider>Extract Records</Divider>
+                    <Divider>{t("extractPage.title1")}</Divider>
                     <TableContainer keyWord={TABLES.EXTRACTRECORD} id={id} />
                 </>
             )}

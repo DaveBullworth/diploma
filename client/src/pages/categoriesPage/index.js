@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { List, Space, Pagination, Typography, Input, Modal } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { Spin, Button, notification } from '../../components/common/index';
 import { EditOutlined, DeleteOutlined, WarningTwoTone, StopTwoTone } from '@ant-design/icons';
 import { fetchCategorys, editCategory, deleteCategory } from "../../http/categorysAPI"; // Импортируем функцию для удаления категории
@@ -9,6 +10,7 @@ import "./style.scss";
 const { Title } = Typography;
 
 const Categories = () => {
+    const { t } = useTranslation();
     const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(5);
@@ -54,8 +56,8 @@ const Categories = () => {
             await editCategory(editedCategory.id, { name: editedCategory.name });
             notification({
                 type: 'success',
-                message: 'Успех',
-                description: `Категория ${oldCategoryName} успешно изменена.`,
+                message: t("notification.success"),
+                description: `${t("table-columns.category")} ${oldCategoryName} ${t("notification.editSucc")}.`,
             });
             setConfirmModalVisible(false);
             setEditCategory({});
@@ -65,8 +67,8 @@ const Categories = () => {
             console.error('Error editing category:', error);
             notification({
                 type: 'error',
-                message: 'Ошибка',
-                description: `Не удалось изменить категорию ${oldCategoryName}: ${error.message}`,
+                message: t("notification.error"),
+                description: `${t("notification.errorDesc8")} ${oldCategoryName}: ${error.message}`,
             });
         }
     };
@@ -78,15 +80,15 @@ const Categories = () => {
 
     return (
         <>
-            <Title>Меню категорий</Title>
+            <Title>{t("categoryPage.title")}</Title>
             {categories && categories.length > 0 ? (
                 <>
                     <List
                         header={
                             <div className='category-list-info'>
                                 <p style={{width:'6rem'}}><b>#</b></p>
-                                <p><b>Name</b></p>
-                                <p><b>N-O positions</b></p>
+                                <p><b>{t("table-columns.name")}</b></p>
+                                <p><b>{t("categoryPage.no_pos")}</b></p>
                             </div>
                         }
                         itemLayout="horizontal"
@@ -96,9 +98,9 @@ const Categories = () => {
                                 <List.Item.Meta
                                     title={
                                         <div className='category-list-info'>
-                                            <p><u><b>{(currentPage - 1) * pageSize + index + 1}</b></u></p>
+                                            <p style={{width:'6rem'}}><u><b>{(currentPage - 1) * pageSize + index + 1}</b></u></p>
                                             <p>{item.name}</p> 
-                                            <p>(Кол-во позиций: <b>{item.count}</b>)</p>
+                                            <p>({t("categoryPage.no_pos")}: <b>{item.count}</b>)</p>
                                         </div>
                                     }
                                 />
@@ -114,7 +116,7 @@ const Categories = () => {
                                         shape="circle"
                                         icon={<DeleteOutlined />}
                                         danger
-                                        onClick={() => handleDeleteCategory(item)} // Добавляем обработчик для удаления категории
+                                        onClick={() => handleDeleteCategory(item)} 
                                     />
                                 </Space>
                             </List.Item>
@@ -132,14 +134,13 @@ const Categories = () => {
             ) : (
                 <Spin size="large" />
             )}
-
             {/* Модальное окно для редактирования категории */}
             <Modal
                 title={
                     <>
                         <WarningTwoTone twoToneColor="orange" style={{fontSize:'20px'}} />
                         {' '}
-                        Изменить категорию <u style={{color:'#1890ff'}}>{oldCategoryName}</u>
+                        {t("modal.editCat")}<u style={{color:'#1890ff'}}>{oldCategoryName}</u>
                     </>
                 }
                 onOk={() => {
@@ -151,14 +152,13 @@ const Categories = () => {
             >
                 <Input type="text" value={editedCategory.name} onChange={(e) => setEditCategory(prevState => ({ ...prevState, name: e.target.value }))} />
             </Modal>
-
             {/* Модальное окно для подтверждения изменения категории */}
             <Modal
                 title={
                     <>
                         <WarningTwoTone twoToneColor="orange" style={{fontSize:'20px'}} />
                         {' '}
-                        Подтвердите изменение названия категории?
+                        {t("modal.confEditCat1")}
                     </>
                 }
                 onOk={handleEditModalOk}
@@ -166,7 +166,7 @@ const Categories = () => {
                 onCancel={() => setConfirmModalVisible(false)}
             >
                 <>
-                    Вы уверены, что хотите изменить название категории <b>"{oldCategoryName}"</b> на <b>"{editedCategory.name}"</b>? Это приведет к изменению <b>{editedCategory.count}</b> позиций.
+                    {t("modal.confEditCat2")} <b>"{oldCategoryName}"</b> {t("table-columns.on")} <b>"{editedCategory.name}"</b>? {t("modal.itWillLead")}  <b>{editedCategory.count}</b> {t("categoryPage.positions")}.
                 </>
             </Modal>
             {/* Модальное окно для удаления категории */}
@@ -179,7 +179,7 @@ const Categories = () => {
                             <WarningTwoTone twoToneColor="orange" style={{fontSize:'20px'}} />
                         )}
                         {' '}
-                        Удаление категории
+                        {t("modal.delCat")}
                     </>
                 }
                 onOk={async () => {
@@ -187,15 +187,15 @@ const Categories = () => {
                         await deleteCategory(deletingCategory.id);
                         notification({
                             type: 'success',
-                            message: 'Успех',
-                            description: `Категория ${deletingCategory.name} успешно удалена.`,
+                            message:  t("notification.success"),
+                            description: `${t("table-columns.category")} ${deletingCategory.name} ${t("notification.successDesc3")}.`,
                         });
                     } catch (error) {
                         console.error('Error deleting category:', error);
                         notification({
                             type: 'error',
-                            message: 'Ошибка',
-                            description: `Не удалось изменить категорию ${deletingCategory.name}: ${error.message}.`,
+                            message:  t("notification.error"),
+                            description: `${t("notification.errorDesc8")} ${deletingCategory.name}: ${error.message}.`,
                         });
                     } finally {
                         fetchData();
@@ -207,9 +207,9 @@ const Categories = () => {
                 okButtonProps={{ style: { display: deletingCategory.count === 0 ? 'inline' : 'none' } }}
             >
                 {deletingCategory.count > 0 ? (
-                    <p>У категории есть <b>{deletingCategory.count}</b> принадлежащих позиций. Удаление данной категории невозможно.</p>
+                    <p>{t("modal.catHave1")} <b>{deletingCategory.count}</b> {t("modal.catHave2")}</p>
                 ) : (
-                    <p>Вы уверены, что хотите удалить категорию "{deletingCategory.name}"?</p>
+                    <p>{t("modal.confDelCat")} "{deletingCategory.name}"?</p>
                 )}
             </Modal>
         </>

@@ -9,43 +9,48 @@ import {
     SnippetsOutlined
  } from '@ant-design/icons';
 import { ROUTES } from '../constants';
+import i18n from "../i18n";
 
-export const menuItems = [
-    {
-        key: ROUTES.POSITIONS,
-        icon: <OrderedListOutlined />,
-        label: <NavLink to={ROUTES.POSITIONS}>POSITIONS</NavLink>,
-    },
-    {
-        key: ROUTES.CREATE_POSITION,
-        icon: <PlusSquareOutlined />,
-        label: <NavLink to={ROUTES.CREATE_POSITION}>ADD POSITION</NavLink>,
-    },
-    {
-        key: ROUTES.CATEGORIES,
-        icon: <SnippetsOutlined />,
-        label: <NavLink to={ROUTES.CATEGORIES}>CATEGORIES</NavLink>,
-    },
-    {
-        key: 'User',
-        icon: <UserOutlined />,
-        label: 'USER',
-        children: [
-            {
-                key: ROUTES.USER_MANAGEMENT,
-                icon: <ContactsOutlined />,
-                label: <NavLink to={ROUTES.USER_MANAGEMENT}>USERS PANEL</NavLink>,
-            },
-            {
-                key: ROUTES.EXTRACTS,
-                icon: <ProfileOutlined />,
-                label: <NavLink to={ROUTES.EXTRACTS}>EXTRACTS</NavLink>,
-            },
-            {
-                key: ROUTES.CREATE_EXTRACT,
-                icon: <PlusOutlined />,
-                label: <NavLink to={ROUTES.CREATE_EXTRACT}>ADD EXTRACT</NavLink>,
-            },
-        ],
-    },
-]
+const getMenuItems = () => {
+    return [
+        {
+            key: ROUTES.POSITIONS,
+            icon: <OrderedListOutlined />,
+            label: <NavLink to={ROUTES.POSITIONS}>{i18n.t('menu.positions')}</NavLink>,
+        },
+        {
+            key: ROUTES.CREATE_POSITION,
+            icon: <PlusSquareOutlined />,
+            label: <NavLink to={ROUTES.CREATE_POSITION}>{i18n.t('menu.addPosition')}</NavLink>,
+        },
+        {
+            key: ROUTES.CATEGORIES,
+            icon: <SnippetsOutlined />,
+            label: <NavLink to={ROUTES.CATEGORIES}>{i18n.t('menu.categories')}</NavLink>,
+        },
+        {
+            key: 'User',
+            icon: <UserOutlined />,
+            label: `${i18n.t('menu.user')}`,
+            children: [
+                {
+                    key: ROUTES.USER_MANAGEMENT,
+                    icon: <ContactsOutlined />,
+                    label: <NavLink to={ROUTES.USER_MANAGEMENT}>{i18n.t('menu.usersPanel')}</NavLink>,
+                },
+                {
+                    key: ROUTES.EXTRACTS,
+                    icon: <ProfileOutlined />,
+                    label: <NavLink to={ROUTES.EXTRACTS}>{i18n.t('menu.extracts')}</NavLink>,
+                },
+                {
+                    key: ROUTES.CREATE_EXTRACT,
+                    icon: <PlusOutlined />,
+                    label: <NavLink to={ROUTES.CREATE_EXTRACT}>{i18n.t('menu.addExtract')}</NavLink>,
+                },
+            ],
+        },
+    ];
+};
+
+export default getMenuItems;

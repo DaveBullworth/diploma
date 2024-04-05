@@ -1,6 +1,7 @@
 import {Tag, Space, Tooltip} from 'antd';
 import { TABLES } from '../../constants';
 import { PlayCircleOutlined, EditOutlined, DeleteOutlined, CloseOutlined, FormOutlined } from '@ant-design/icons';
+import i18n from "../../i18n";
 
 export const columns = (
             handleShow,
@@ -22,50 +23,50 @@ export const columns = (
             key: 'number',
         },
         {
-            title: 'Category',
+            title: i18n.t("table-columns.category"),
             dataIndex: ['category', 'name'], 
             key: 'category',
             ...filterCategoriesOrUsers(TABLES.POSITION)
         },
         {
-            title: 'Name',
+            title:  i18n.t("table-columns.name"),
             dataIndex: 'name',
             key: 'name',
         },
         {
-            title: 'Description',
+            title:  i18n.t("table-columns.desc"),
             dataIndex: 'desc',
             key: 'desc',
         },
         {
-            title: 'Article',
+            title:  i18n.t("table-columns.article"),
             dataIndex: 'article',
             key: 'article',
         },
         {
-            title: 'Factory',
+            title:  i18n.t("table-columns.factory"),
             dataIndex: 'factory',
             key: 'factory',
         },
         {
-            title: 'Quantity',
+            title:  i18n.t("table-columns.quantity"),
             dataIndex: 'quantity',
             key: 'quantity',
             sorter: { multiple: 1 }, // Добавляем флаг сортировки
             sortOrder: sort.quantity, // Устанавливаем порядок сортировки
         },
         {
-            title: 'U.M.',
+            title:  i18n.t("table-columns.um"),
             dataIndex: 'um',
             key: 'um',
         },
         {
-            title: 'Shortage',
+            title:  i18n.t("table-columns.shortage"),
             dataIndex: 'quantity_min',
             key: 'shortage',
             render: (quantity_min, record) => {
                 if (quantity_min >= record.quantity) {
-                    return <Tag color="red">LOW</Tag>;
+                    return <Tag color="red">{i18n.t("table-columns.low")}</Tag>;
                 } else {
                     return null; // Нет дефицита, не отображаем тег
                 }
@@ -74,20 +75,20 @@ export const columns = (
             sortOrder: sort.quantity_min, // Устанавливаем порядок сортировки
         },
         {
-            title: 'Action',
+            title: i18n.t("table-columns.action"),
             key: 'action',
             render: (text, record) => (
                 <Space className="ActionIcons" size="small">
-                    <Tooltip title="Show">
+                    <Tooltip title={i18n.t("table-columns.tooltip.show")}>
                         <PlayCircleOutlined style={{ color: 'green', fontSize: '18px' }} onClick={() => handleShow(record.id)} />
                     </Tooltip>
-                    <Tooltip title="Edit">
+                    <Tooltip title={i18n.t("table-columns.tooltip.edit")}>
                         <EditOutlined style={{ color: 'blue', fontSize: '18px' }} onClick={() => handleEdit(record.id)} />
                     </Tooltip>
-                    <Tooltip title="Delete">
+                    <Tooltip title={i18n.t("table-columns.tooltip.delete")}>
                         <DeleteOutlined style={{ color: 'red', fontSize: '18px' }} onClick={() => showConfirm(record.id, record.name)} />
                     </Tooltip>
-                    <Tooltip title="New Record">
+                    <Tooltip title={i18n.t("table-columns.tooltip.newRecord")}>
                         <FormOutlined style={{ color: 'black', fontSize: '18px' }} onClick={() => handleForm(record.id)} />
                     </Tooltip>
                 </Space>
@@ -102,7 +103,7 @@ export const columns = (
             key: 'number',
         },
         {
-            title: 'User',
+            title: i18n.t("table-columns.user"),
             dataIndex: 'user',
             key: 'user',
             ...filterCategoriesOrUsers(TABLES.EXTRACT)
@@ -113,7 +114,7 @@ export const columns = (
             key: 'extracts',
         },
         {
-            title: 'Date',
+            title: i18n.t("table-columns.date"),
             dataIndex: 'date',
             key: 'date',
             render: date => {
@@ -132,17 +133,17 @@ export const columns = (
             ...getDateSearchProps(),
         },
         {
-            title: 'Action',
+            title: i18n.t("table-columns.action"),
             key: 'action',
             render: (text, record) => (
                 <Space size="middle">
-                    <Tooltip title="Show">
+                    <Tooltip title={i18n.t("table-columns.tooltip.show")}>
                         <PlayCircleOutlined style={{ color: 'green', fontSize: '18px' }} onClick={() => handleShow(record.id)} />
                     </Tooltip>
-                    <Tooltip title="Edit">
+                    <Tooltip title={i18n.t("table-columns.tooltip.edit")}>
                         <EditOutlined style={{ color: 'blue', fontSize: '18px' }} onClick={() => handleEdit(record.id)} />
                     </Tooltip>
-                    <Tooltip title="Delete">
+                    <Tooltip title={i18n.t("table-columns.tooltip.delete")}>
                         <DeleteOutlined style={{ color: 'red', fontSize: '18px' }} onClick={() => showConfirm(record.id, record.user + '#' + record.id)} />
                     </Tooltip>
                 </Space>
@@ -157,36 +158,38 @@ export const columns = (
             key: 'number',
         },
         {
-            title: 'Description',
+            title: i18n.t("table-columns.desc"),
             dataIndex: 'desc_fact',
             key: 'desc_fact',
         },
         {
-            title: 'Quantity',
+            title: i18n.t("table-columns.quantity"),
             dataIndex: 'quantity',
             key: 'quantity',
         },
         {
-            title: 'U.M.',
+            title: i18n.t("table-columns.um"),
             dataIndex: 'um',
             key: 'um',
         },
         {
-            title: 'Q-Y',
+            title: i18n.t("table-columns.QY"),
             dataIndex: 'quantity_um',
             key: 'quantity_um',
             render: (quantity_um, record) => {
-                const displayQuantity = quantity_um !== 1 ? `по ${quantity_um} в 1 ${record.um}` : 'отдельно';
+                const displayQuantity = quantity_um !== 1 ?
+                    `${i18n.t("table-columns.by")} ${quantity_um} ${i18n.t("table-columns.in")} 1 ${record.um}` 
+                    : i18n.t("table-columns.apart");
                 return displayQuantity;
             },
         },        
         {
-            title: 'Provider',
+            title: i18n.t("table-columns.provider"),
             dataIndex: 'provider',
             key: 'provider',
         },
         {
-            title: 'Date',
+            title: i18n.t("table-columns.date"),
             dataIndex: 'date',
             key: 'date',
             render: date => {
@@ -205,14 +208,14 @@ export const columns = (
             ...getDateSearchProps(),
         },
         {
-            title: 'Action',
+            title: i18n.t("table-columns.action"),
             key: 'action',
             render: (text, record) => (
                 <Space size="middle">
-                    <Tooltip title="Edit">
+                    <Tooltip title={i18n.t("table-columns.tooltip.edit")}>
                         <EditOutlined style={{ color: 'blue', fontSize: '18px' }} onClick={() => handleEdit(record.id)} />
                     </Tooltip>
-                    <Tooltip title="Delete">
+                    <Tooltip title={i18n.t("table-columns.tooltip.delete")}>
                         <DeleteOutlined style={{ color: 'red', fontSize: '18px' }} onClick={() => showConfirm(record.id, record.desc_fact)} />
                     </Tooltip>
                 </Space>
@@ -227,34 +230,34 @@ export const columns = (
             key: 'number',
         },
         {
-            title: 'Description(Position)',
+            title: i18n.t("table-columns.desc_pos"),
             dataIndex: ['record', 'position', 'desc'],
             key: 'desc',
         },
         {
-            title: 'Description(Record)',
+            title: i18n.t("table-columns.desc_fact"),
             dataIndex: ['record', 'desc_fact'],
             key: 'desc_fact',
         },
         {
-            title: 'Quantity',
+            title: i18n.t("table-columns.quantity"),
             dataIndex: 'quantity',
             key: 'quantity',
             sorter: true,
             sortOrder: sort.quantity, // Устанавливаем порядок сортировки
         },
         {
-            title: 'U.M.',
+            title: i18n.t("table-columns.um"),
             dataIndex: ['record', 'um'],
             key: 'um',
         },
         {
-            title: 'User',
+            title: i18n.t("table-columns.user"),
             dataIndex: ['extract', 'user', 'login'],
             key: 'user',
         },
         {
-            title: 'Project',
+            title: i18n.t("table-columns.project"),
             dataIndex: 'project',
             key: 'project',
         }

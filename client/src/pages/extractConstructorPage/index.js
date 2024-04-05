@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Card, Avatar, Typography, Input, InputNumber, DatePicker } from 'antd';
 import { WarningTwoTone, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -22,6 +23,7 @@ const { Title } = Typography;
 
 const ExtractConstructor = ({update}) => {
     const { id } = useParams(); 
+    const { t } = useTranslation();
     const navigate = useNavigate();
     // Определяем минимальную и максимальную даты
     const minDate = dayjs().subtract(5, 'year');
@@ -61,10 +63,10 @@ const ExtractConstructor = ({update}) => {
     const [currentSearchBlockIndex, setCurrentSearchBlockIndex] = useState(null); 
 
     const showConfirm = () => {
-        const content = `Sure to delete: ${id} extract?`;
+        const content = `${t("modal.sureDel")}: ${id} ${t("extractPage.extract")}?`;
         Modal({
           type: 'confirm',
-          title: 'Confirmation',
+          title: t("modal.confirm"),
           content,
           onOk() {
             handleDelete(id)
@@ -88,8 +90,8 @@ const ExtractConstructor = ({update}) => {
             
             notification({
                 type: 'success',
-                message: 'Success!',
-                description: `${id} extract deleted successfully!`,
+                message: t("notification.success"),
+                description: `${id} ${t("extractPage.extract")} ${t("notification.successDesc3")}!`,
             });
     
             navigate(ROUTES.EXTRACTS);
@@ -322,15 +324,15 @@ const ExtractConstructor = ({update}) => {
                     // Показываем модальное окно с предупреждением
                     Modal({
                         type: 'confirm',
-                        title: 'Внимание',
+                        title: t("modal.attention"),
                         icon: <WarningTwoTone twoToneColor="#faad14" />,
                         content: (
                             <>
-                                Вы хотите изменить выписку, созданную другим пользователем (<b>{response2.name}</b>). Подтверждая, вы присвоите данную выписку себе (<b>{currentUserInfo.name}</b>).`
+                                {t("extractConstructor.title1")} (<b>{response2.name}</b>). {t("extractConstructor.title2")} (<b>{currentUserInfo.name}</b>).`
                             </>
                         ),
-                        okText: 'Подтверждаю',
-                        cancelText: 'Отмена',
+                        okText: t("modal.confirm__"),
+                        cancelText: t("modal.decline"),
                         onOk: async () => {
                             // Продолжаем работу функции saveData
                             if (!actionsExecuted) {
@@ -346,8 +348,8 @@ const ExtractConstructor = ({update}) => {
                             fetchExtractRecordsData();
                             notification({
                                 type: 'success',
-                                message: 'Success!',
-                                description: 'Extract modified successfully!',
+                                message: t("notification.success"),
+                                description: `${t("notification.extract")} ${t("notification.editSucc")}!`,
                             });
                         },
                         onCancel: () => {
@@ -361,12 +363,12 @@ const ExtractConstructor = ({update}) => {
     
             // Проверка наличия пустых записей в formDataArray при создании новой выписки
             if (!update && (formDataArray.length === 0 || formDataArray.some(formData => Object.values(formData).some(value => value === '' || value === null || value === 0)))) {
-                throw new Error("Attempt to create extract with empty records");
+                throw new Error(t("extractConstructor.errTitle1"));
             }
     
             // Проверка наличия записей с quantity больше, чем quantity_left
             if (formDataArray.some(formData => formData.quantity > formData.quantity_left)) {
-                throw new Error("Attempt to " + (update ? "modify" : "create") + " extract with records exceeding available quantity");
+                throw new Error(t("extractConstructor.err3") + (update ? t("extractConstructor.mod") : t("extractConstructor.create")) + t("extractConstructor.errTitle2"));
             }
     
             let newExtract = {};
@@ -396,14 +398,14 @@ const ExtractConstructor = ({update}) => {
             }]);
             notification({
                 type: 'success',
-                message: 'Success!',
-                description: 'Extract ' + (update ? 'modified' : 'created') + ' successfully!',
+                message: t("notification.success"),
+                description: t("notification.extract") + (update ? t("extractConstructor.mod_") : t("extractConstructor.create_")) + t("notification.successDesc3"),
             });
         } catch (error) {
-            console.error('Ошибка при ' + (update ? 'изменении' : 'создании') + ' выписки:', error);
+            console.error(t("notification.error_") + (update ? t("extractConstructor.mod")  : t("extractConstructor.create")) + ' выписки:', error);
             notification({
                 type: 'error',
-                message: 'Failed to ' + (update ? 'edit' : 'add') + ' extract!',
+                message: t("notification.errorDesc10") + (update ? t("extractConstructor.mod__") : t("extractConstructor.edit__")) + t("extractConstructor.extract"),
                 description: error.message,
             });
         } finally {
@@ -481,8 +483,8 @@ const ExtractConstructor = ({update}) => {
             console.error('Ошибка при ' + (update ? 'изменении' : 'создании') + ' записей выписки:', error);
             notification({
                 type: 'error',
-                message: 'Error!',
-                description: 'Failed to ' + (update ? 'edit' : 'add') + ' extract records!',
+                message:  t("notification.error"),
+                description: t("notification.errorDesc10") + (update ? t("extractConstructor.mod__") : t("extractConstructor.edit__")) + t("extractConstructor.extract"),
             });
         }
     }
@@ -502,7 +504,7 @@ const ExtractConstructor = ({update}) => {
                                 style={{ color: 'green', fontSize: '28px' }} 
                                 onClick={() => navigate(ROUTES.EXTRACTS)}
                             />
-                            Изменить выписку <strong style={{color: '#1890ff'}}>#{id}</strong> пользователя <u style={{color: '#1890ff'}}>{extractUserInfo}</u> в качестве пользователя
+                            {t("extractConstructor.editExtract")} <strong style={{color: '#1890ff'}}>#{id}</strong> {t("extractConstructor.user")} <u style={{color: '#1890ff'}}>{extractUserInfo}</u> {t("extractConstructor.inUser")}
                             <DeleteOutlined 
                                 className="delete-icon" 
                                 style={{ color: 'red', fontSize: '28px' }} 
@@ -510,25 +512,25 @@ const ExtractConstructor = ({update}) => {
                             />
                         </span>
                         :
-                        'Создать новую выписку в качестве пользователя:'}
+                        t("extractConstructor.title3" + ":")}
                     >
                         <Meta
                             avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
                             title={
                                 <div className='user-info-card-meta-block-container'>
                                     <div>
-                                        <u style={{color: '#1890ff'}}>Login:</u>
+                                        <u style={{color: '#1890ff'}}>{t("userManagment.login")}:</u>
                                         <span style={{marginLeft:'20px'}}>{currentUserInfo.login}</span>
                                     </div>
                                     <div className='right-allight'>
-                                        <b style={{color: '#1890ff', marginRight:'65px'}}>ДАТА ВЫПИСКИ:</b>
+                                        <b style={{color: '#1890ff', marginRight:'65px'}}>{t("extractConstructor.date")}</b>
                                     </div>
                                 </div>
                             }
                             description={
                                 <div className='user-info-card-meta-block-container'>
                                     <div>
-                                        <u style={{color: '#1890ff'}}>Name:</u>
+                                        <u style={{color: '#1890ff'}}>{t("table-columns.name")}:</u>
                                         <span style={{marginLeft:'20px'}}>{currentUserInfo.name}</span>
                                     </div>
                                     <div className='right-allight'>
@@ -551,9 +553,9 @@ const ExtractConstructor = ({update}) => {
                     {formDataArray.map((formData, index) => (
                         <div className="record" key={index}>
                             <div className="record-header">
-                                <Title level={4}>Запись выписки <u style={{color:'#1890ff'}}>№{index + 1}</u></Title>
+                                <Title level={4}>{t("extractConstructor.ER")} <u style={{color:'#1890ff'}}>№{index + 1}</u></Title>
                                 <Button danger type='default' onClick={() => removeRecord(index)}>
-                                    Убрать эту запись
+                                    {t("extractConstructor.remRec")}
                                 </Button>
                             </div>
                             <div style={{marginBottom:'1rem'}}>
@@ -565,38 +567,38 @@ const ExtractConstructor = ({update}) => {
                             <div className="record-body">
                                 <div className="record-body-block" >
                                     <div className="input-field">
-                                        <label>Название проекта:</label>
+                                        <label>{t("extractConstructor.projName")}:</label>
                                         <Input
                                             value={formData.project}
                                             onChange={e => handleInputChange(index, e.target.value, 'project')}
-                                            placeholder="Название проекта"
+                                            placeholder={t("extractConstructor.projName")}
                                         />
                                     </div>
                                     <div className="input-field">
                                         <label>
-                                            {formData.recordId ? 'Количество ' : 'Количество'} 
+                                            {formData.recordId ? t("extractConstructor.quantity") : t("extractConstructor.quantity")}{" "}
                                             <span style={{ fontWeight: 'bold' }}>{formData.um}</span>:
                                         </label>
                                         <InputNumber
                                             type='number'
                                             value={formData.quantity}
                                             onChange={value => handleInputChange(index, value, 'quantity')}
-                                            placeholder="Количество"
+                                            placeholder={t("extractConstructor.quantity")}
                                         />
                                     </div>
                                 </div>
                                 <div className="record-body-block">
                                     <Card
-                                        title={formData.recordId ? formData.desc_fact : "Запись не выбрана"}
+                                        title={formData.recordId ? formData.desc_fact : t("extractConstructor.noRec")}
                                     >
                                         {formData.recordId ? (
                                             <>
                                                 <p>
-                                                    <b>Количество:</b> {formData.quantity_r}{" "}{formData.um}{" "}
-                                                    <b>Остаток:</b> {formData.quantity_left}{" "}{formData.um}
+                                                    <b>{t("extractConstructor.quantity")}:</b> {formData.quantity_r}{" "}{formData.um}{" "}
+                                                    <b>{t("extractConstructor.left")}:</b> {formData.quantity_left}{" "}{formData.um}
                                                 </p>
-                                                <p><b>Поставщик:</b> {formData.provider}</p>
-                                                <p><b>Дата поставки:</b> {new Date(formData.date).toLocaleString(
+                                                <p><b>{t("table-columns.provider")}:</b> {formData.provider}</p>
+                                                <p><b>{t("recordConstructor.date")}:</b> {new Date(formData.date).toLocaleString(
                                                     'en-GB', { 
                                                         day: '2-digit', 
                                                         month: '2-digit', 
@@ -607,7 +609,7 @@ const ExtractConstructor = ({update}) => {
                                                 )}</p>
                                             </>
                                         ) : (
-                                            <p>Выберете запись для выписки</p>
+                                            <p>{t("extractConstructor.chooseRec")}</p>
                                         )}
                                     </Card>
                                 </div>
@@ -619,7 +621,7 @@ const ExtractConstructor = ({update}) => {
                                 type="primary" 
                                 onClick={addNewRecord}
                             >
-                                Добавить ещё запись
+                                {t("extractConstructor.addRec")}
                             </Button>
                             <Button 
                                 danger
@@ -627,7 +629,7 @@ const ExtractConstructor = ({update}) => {
                                 onClick={saveData} 
                                 style={{ marginLeft: '10px' }}
                             >
-                                Сохранить
+                                {t("positionConstructor.save")}
                             </Button>
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Input, Typography, List, Pagination, Empty, AutoComplete, Modal } from 'antd';
 import { PlusOutlined, CheckOutlined, ArrowLeftOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { notification, Button } from '../../components/common/index';
@@ -16,6 +17,7 @@ const { Title } = Typography;
 
 const PositionConstructor = ({update}) => {
     const { id } = useParams();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 4 });
@@ -84,7 +86,7 @@ const PositionConstructor = ({update}) => {
             const modalContent = (
                 <>
                     {response.rows.length === 0 ? (
-                        <Empty description="There are no matches" />
+                        <Empty description={t("positionConstructor.noMatches")} />
                     ) : (
                         <>
                             <List
@@ -94,7 +96,7 @@ const PositionConstructor = ({update}) => {
                                     <List.Item key={item.id}>
                                         <List.Item.Meta
                                             title={<span>{((pagination.current - 1) * pagination.pageSize) + index + 1}. {item.desc}</span>}
-                                            description={`Article: ${item.article}`}
+                                            description={`${t("table-columns.article")}: ${item.article}`}
                                         />
                                         {selectedPositions.some(selectedItem => selectedItem.id === item.id) ? (
                                             <CheckOutlined style={{ color: 'green' }} />
@@ -122,8 +124,8 @@ const PositionConstructor = ({update}) => {
             console.error('Error fetching positions:', error);
             notification({
                 type: 'error',
-                message: 'Error!',
-                description: 'Failed to fetch Positions data!',
+                message: t("notification.error"),
+                description: t("notification.errorDesc1"),
             });
         }
     }, [pagination, selectedPositions, showModal]);
@@ -150,8 +152,8 @@ const PositionConstructor = ({update}) => {
             } catch (error) {
                 notification({
                     type: 'error',
-                    message: 'Error!',
-                    description: 'Failed to fetch Position data!',
+                    message: t("notification.error"),
+                    description: t("notification.errorDesc1"),
                 });
                 console.error('Ошибка при получении позиции:', error);
             }
@@ -164,8 +166,8 @@ const PositionConstructor = ({update}) => {
             } catch (error) {
                 notification({
                     type: 'error',
-                    message: 'Error!',
-                    description: 'Failed to fetch categorys!',
+                    message: t("notification.error"),
+                    description: t("notification.errorDesc2"),
                 });
                 console.error('Ошибка при получении категорий:', error);
             }
@@ -182,7 +184,7 @@ const PositionConstructor = ({update}) => {
 
     const handleSubmit = async () => {
         try {
-            let description = 'New Position added successfully!'
+            let description = t("notification.successDesc1")
             const formData = {
                 ...inputValues,
                 selectedPositions: selectedPositions.map(position => position.id)
@@ -199,7 +201,7 @@ const PositionConstructor = ({update}) => {
             if(update) {
                 const editedPosition = await editPosition(id, formData);
 
-                description = `Position ${editedPosition.name} edited successfully!`
+                description = `${t("notification.position")} ${editedPosition.name} ${t("notification.editSucc")}`
     
                 const hierarchies = await fetchPositionsHierarchy(id);
     
@@ -264,15 +266,15 @@ const PositionConstructor = ({update}) => {
             }
             notification({
                 type: 'success',
-                message: 'Success!',
+                message: t("notification.success"),
                 description: description,
             });
         } catch (error) {
             console.error('Error handling submit:', error);
             notification({
                 type: 'error',
-                message: 'Error!',
-                description: 'Failed to add position!',
+                message: t("notification.error"),
+                description: t("notification.errorDesc3"),
             });
         }
     };    
@@ -294,17 +296,17 @@ const PositionConstructor = ({update}) => {
                         />
                     </>
                 )}
-                <Title>{update ? `Редактирование позиции ` : 'Создание новой позиции '}<u style={{ color: '#1890ff' }}>{inputValues.name}</u></Title>
+                <Title>{update ? t("positionConstructor.titleUpdate") : t("positionConstructor.titleNew") }<u style={{ color: '#1890ff' }}>{inputValues.name}</u></Title>
             </div>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Категория:</label>
+                    <label>{t("table-columns.category")}:</label>
                     <AutoComplete
                         options={categories.map(category => ({
                             value: category.name,
                             label: category.name
                         }))}
-                        placeholder="Выберите категорию"
+                        placeholder={t("positionConstructor.choose") + " " + t("positionConstructor.category")}
                         value={inputValues.category}
                         onChange={value => handleInputChange('category', value)}
                         filterOption={(inputValue, option) =>
@@ -313,9 +315,9 @@ const PositionConstructor = ({update}) => {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Название:</label>
+                    <label>{t("table-columns.name")}:</label>
                     <Input 
-                        placeholder="Введите название" 
+                        placeholder={t("positionConstructor.enter") + " " + t("table-info.name")}
                         value={inputValues.name} 
                         onChange={e => handleInputChange('name', e.target.value)} 
                     />
@@ -323,18 +325,18 @@ const PositionConstructor = ({update}) => {
             </div>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Описание:</label>
+                    <label>{t("table-columns.desc")}:</label>
                     <Input.TextArea 
-                        placeholder="Введите описание" 
+                        placeholder={t("positionConstructor.enter") + " " + t("table-info.desc")}
                         style={{ height: '18px' }} 
                         value={inputValues.desc} 
                         onChange={e => handleInputChange('desc', e.target.value)} 
                     />
                 </div>
                 <div className="form-group">
-                    <label>Артикул:</label>
+                    <label>{t("table-columns.article")}:</label>
                     <Input 
-                        placeholder="Введите артикул" 
+                        placeholder={t("positionConstructor.enter") + " " + t("table-info.article")} 
                         value={inputValues.article} 
                         onChange={e => handleInputChange('article', e.target.value)} 
                     />
@@ -342,18 +344,18 @@ const PositionConstructor = ({update}) => {
             </div>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Производитель:</label>
+                    <label>{t("table-columns.factory")}:</label>
                     <Input 
-                        placeholder="Введите производителя" 
+                        placeholder={t("positionConstructor.enter") + " " + t("positionConstructor.factory")} 
                         value={inputValues.factory} 
                         onChange={e => handleInputChange('factory', e.target.value)} 
                     />
                 </div>
                 <div className="form-group">
-                    <label>Количество:</label>
+                    <label>{t("table-columns.quantity")}:</label>
                     <Input 
                         type="number" 
-                        placeholder="Введите количество" 
+                        placeholder={t("positionConstructor.enter") + " " + t("table-info.quantity")}  
                         disabled={true}
                         value={inputValues.quantity} 
                         onChange={e => handleInputChange('quantity', e.target.value)} 
@@ -362,7 +364,7 @@ const PositionConstructor = ({update}) => {
             </div>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Единица измерения:</label>
+                    <label>{t("table-columns.um")}:</label>
                     <Input 
                         defaultValue="шт." 
                         placeholder="шт." 
@@ -371,17 +373,17 @@ const PositionConstructor = ({update}) => {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Минимальное количество:</label>
+                    <label>{t("positionConstructor.quantity_min")}:</label>
                     <Input 
                         type="number" 
-                        placeholder="Введите минимальное количество" 
+                        placeholder={t("positionConstructor.enter") + " " + t("positionConstructor.quantity_min")} 
                         value={inputValues.quantity_min} 
                         onChange={e => handleInputChange('quantity_min', e.target.value)} 
                     />
                 </div>
             </div>
             <div className="form-group full-width">
-                <label>Принадлежности:</label>
+                <label>{t("positionConstructor.related")}:</label>
                 <SearchContainer options={options()(TABLES.POSITION)} onSearch={fetchPositionsAndUpdateModal} />
             </div>
             {selectedPositions.length > 0 &&
@@ -391,12 +393,12 @@ const PositionConstructor = ({update}) => {
                     handleRemoveRelated={(id) => handleRemoveRelated(id)}
                 />
             }
-            <Button className="submit-btn" onClick={handleSubmit} text='Сохранить'/>
+            <Button className="submit-btn" onClick={handleSubmit} text={t("positionConstructor.save")}/>
 
             {/* Render modal */}
             <Modal
                 open={modalVisible}
-                title="Search Results"
+                title={t("positionConstructor.searchRes")}
                 onCancel={hideModal}
                 footer={null}
             >

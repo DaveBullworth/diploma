@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Input, Checkbox, Divider, DatePicker } from 'antd';
 import { SearchOutlined, FilterFilled, SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 import { fetchPositions, fetchOnePosition, deletePosition, editPosition } from '../../http/positionsAPI';
@@ -16,6 +17,7 @@ import './style.scss'
 const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId}) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation()
     const searchInputRef = useRef(null);
 
     const isPositionPage = location.pathname === '/position';
@@ -49,8 +51,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             } catch (error) {
                 notification({
                     type: 'error',
-                    message: 'Error!',
-                    description: 'Failed to fetch categorys!',
+                    message: t("notification.error"),
+                    description: t("notification.errorDesc2"),
                 });
                 console.error('Ошибка при получении категорий:', error);
             } finally {
@@ -66,8 +68,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             } catch (error) {
                 notification({
                     type: 'error',
-                    message: 'Error!',
-                    description: 'Failed to fetch users!',
+                    message: t("notification.error"),
+                    description: t("notification.errorDesc4"),
                 });
                 console.error('Ошибка при получении пользователей:', error);
             } finally {
@@ -319,7 +321,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             switch (keyWord) {
                 case TABLES.POSITION:
                     await deletePosition(id);
-                    toDescription = 'позицию'
+                    toDescription = t("notification.position_")
                     break
                 case TABLES.RECORD:
                     const record = await fetchOneRecord(id)
@@ -327,7 +329,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     const newQuantity = position.quantity - (record.quantity*record.quantity_um)
                     await editPosition(position.id, {quantity: newQuantity})
                     await deleteRecord(id);
-                    toDescription = 'запись'
+                    toDescription = t("notification.record")
                     break
                 case TABLES.EXTRACT:
                     const response1 = await fetchExtractRecords(null, null, id);
@@ -339,7 +341,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         await deleteExtractRecord(extract.id);
                     }
                     await deleteExtract(id);
-                    toDescription = 'выписка'
+                    toDescription = t("notification.extract")
                     break
                 default:
                     break; 
@@ -347,15 +349,15 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             fetchData();
             notification({
                 type: 'success',
-                message: 'Success!',
-                description: `${keyWord.slice(0, -1).toLowerCase()} deleted successfully!`,
+                message: t("notification.success"),
+                description: `${keyWord.slice(0, -1).toLowerCase()} ${t("notification.successDesc3")}!`,
             });
         } catch (err) {
             console.error(err);
             notification({
                 type: 'error',
-                message: 'Ошибка',
-                description: `Не удалось удалить ${toDescription}: ${err.message}`,
+                message: t("notification.error"),
+                description: `${t("notification.errorDesc5")} ${toDescription}: ${err.message}`,
             });
         } finally {
             setLoading(false)
@@ -363,10 +365,10 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
     };
 
     const showConfirm = (id, name) => {
-        const content = `Sure to delete: ${name} ${keyWord.slice(0, -1).toLowerCase()}?`;
+        const content = `${t("modal.sureDel")}: ${name} ${t(`notification.${keyWord.slice(0, -1).toLowerCase()}`)}?`;
         Modal({
           type: 'confirm',
-          title: 'Confirmation',
+          title: t("modal.confirm"),
           content,
           onOk() {
             handleDelete(id)
@@ -472,7 +474,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         type='default'
                         className="reset-btn"
                     >
-                        Reset
+                        {t("table-info.reset")}
                     </Button>
                     <Button
                         type="primary"
@@ -497,7 +499,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             <div className="search-container">
                 <Input
                     ref={searchInputRef}
-                    placeholder={`Search ${dataIndex.includes('-')?dataIndex.replace('-', ''):dataIndex}`}
+                    placeholder={`${t(`table-info.${dataIndex.includes('-')?dataIndex.replace('-', ''):dataIndex}`)}`}
                     value={filters[dataIndex]}
                     onChange={(e) => {
                         setFilters({ ...filters, [dataIndex]: e.target.value });
@@ -572,13 +574,13 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
     const renderExtractRecordFilter = (key, value) => {
         switch (key) {
             case 'project+':
-                return 'project';
+                return t("extractRecordFilters.project");
             case 'record,um+':
-                return 'u.m.';
+                return t("extractRecordFilters.um");
             case 'record,desc_fact+':
-                return 'record desc';
+                return t("extractRecordFilters.record_desc");
             case 'record,position,desc+':
-                return 'position desc';
+                return t("extractRecordFilters.position_desc");
             default:
                 return `${key} ${value}`;
         }
@@ -644,13 +646,13 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 <div className="table-info">
                     <div className='info-container'>
                         <div className='filter-info-container'>
-                            <label>Filters:</label>
+                            <label>{t("table-info.filters")}:</label>
                             {Object.entries(displayedFilters).map(([key, value]) => (
                                 value && (
                                     <span key={key}>
                                         {keyWord === TABLES.EXTRACTRECORD
                                             ? <u>{renderExtractRecordFilter(key, value)}</u>
-                                            : key === 'categoryId' ? 'Category' : <u>{key}</u>}
+                                            : key === 'categoryId' ? t("table-info.category") : <u>{t(`table-info.${key}`)}</u>}
                                         : {key === 'categoryId' ? categories.find(cat => cat.id === value)?.name : value}
                                     </span>
                                 )
@@ -659,7 +661,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                                     <span key={key}>
                                         {keyWord === TABLES.EXTRACTRECORD
                                             ? <u>{renderExtractRecordFilter(key, value)}</u>
-                                            : key === 'categoryId' ? <u>Category</u> : <u>{key}</u>}
+                                            : key === 'categoryId' ? <u>{t("table-info.category")}</u> : <u>{t(`table-info.${key}`)}</u>}
                                         : {key === 'categoryId' ? categories.find(cat => cat.id === value)?.name : value}
                                         {index !== array.length - 1 && ', '}
                                     </span>
@@ -667,12 +669,12 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                             ))}
                         </div>
                         <div className='sort-info-container'>
-                            <label>Sort:</label>
+                            <label>{t("table-info.sort")}:</label>
                             {Object.keys(sort).length > 0 ? (
                                 <div>
                                     {Object.entries(sort).map(([field, order], index) => (
                                         <span key={field}>
-                                            {field === 'quantity_min' ? 'Недостача' : field}
+                                            {field === 'quantity_min' ? t("table-info.shortage") : t("table-info.quantity")}
                                             : {order === 'ascend' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
                                             {index !== Object.keys(sort).length - 1 ? ', ' : ''}
                                         </span>
@@ -685,7 +687,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     </div>
                     <div className='info-btn-container'>
                         <Button onClick={handleResetFilters}>
-                            Reset<br/>Filters
+                        {t("table-info.reset")}<br/>{t("table-info.filters")}
                         </Button>
                     </div>
                 </div>

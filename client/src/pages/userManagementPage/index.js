@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     EditOutlined, UserAddOutlined, 
     WarningTwoTone, StopTwoTone,
@@ -15,6 +16,7 @@ const { Title } = Typography;
 
 
 const UserManagement = () => {
+    const { t } = useTranslation();
     // Получение данных о текущем пользователе из Redux store
     const usersPerPage = 4;
     const currentUserId = useSelector(state => state.user.user.id);
@@ -100,15 +102,15 @@ const UserManagement = () => {
             fetchUsersInfo();
             notification({
                 type: 'success',
-                message: 'Success!',
-                description: `User ${selectedUser.login} deleted successfully!`,
+                message: t("modal.success"),
+                description: `${t("table-columns.user")} ${selectedUser.login} ${t("notification.successDesc3")}!`,
             });
         } catch (error) {
             console.error('Error deleting user:', error);
             notification({
                 type: 'error',
-                message: 'Error!',
-                description: `Failed to delete ${selectedUser.login} user!`,
+                message: t("modal.error"),
+                description: `${t("notification.errorDesc5")} ${selectedUser.login} ${t("userManagment.user")}!`,
             });
         }
     };
@@ -141,8 +143,8 @@ const UserManagement = () => {
         // Если поле password пустое, удаляем его из объекта editedUser
         const editedUserData = isPasswordEmpty ? { ...editedUser, password: undefined } : editedUser;
         const confirmEdit = Modal.confirm({
-            title: 'Внимание!',
-            content: `Подтвердите ${isRegistration ? 'регистрацию нового' : 'изменение'} пользователя '${isRegistration ? editedUser.login : selectedUser.login }'`,
+            title: t("modal.attention"),
+            content: `${t("modal.confirm_")} ${isRegistration ? t("modal.regNew") : t("modal.edition")} ${t("modal.user")} '${isRegistration ? editedUser.login : selectedUser.login }'`,
             onOk: async () => {
                 try {
                     if (isRegistration) {
@@ -154,11 +156,11 @@ const UserManagement = () => {
                     fetchUsersInfo();
                     notification({
                         type: 'success',
-                        message: 'Success!',
-                        description: `User ${isRegistration ? editedUser.login : selectedUser.login } ${isRegistration ? 'registered' : 'edited'} successfully!`,
+                        message: t("modal.success"),
+                        description: `${t("modal.user_")} ${isRegistration ? editedUser.login : selectedUser.login } ${isRegistration ? t("modal.reged") : t("modal.edited")} ${t("notification.success_")}!`,
                     });
                 } catch (error) {
-                    let errorMessage = 'An error occurred while register';
+                    let errorMessage = t("notification.errorDesc9");
                     if (error.response && error.response.data && error.response.data.message) {
                       errorMessage = error.response.data.message;
                     } else if (error.message) {
@@ -167,7 +169,7 @@ const UserManagement = () => {
                     console.error('Error editing user:', error);
                     notification({
                         type: 'error',
-                        message: `Failed to ${isRegistration ? 'register' : 'edit'} ${isRegistration ? editedUser.login : selectedUser.login } user!`,
+                        message: `${t("notification.errorDesc10")} ${isRegistration ? t("notification.reg") : t("notification.edit")} ${isRegistration ? editedUser.login : selectedUser.login } ${t("modal.user")}!`,
                         description: errorMessage
                     });
                 }
@@ -186,14 +188,14 @@ const UserManagement = () => {
         <div>
             {/* Данные о текущем пользователе */}
             <Card 
-                title='Данные авторизованного пользователя:'
+                title={t("userManagment.title1") + ':'}
             >    
                 <Meta
                     avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
                                         title={
                         <div className='user-info-card-meta-block-container'>
                             <div>
-                                <u style={{color: '#1890ff'}}>Login:</u>
+                                <u style={{color: '#1890ff'}}>{t("userManagment.login")}:</u>
                                 <span style={{marginLeft:'20px'}}>{currentUserInfo.login}</span>
                             </div>
                             <div className='right-allight'>
@@ -205,12 +207,12 @@ const UserManagement = () => {
                     description={
                         <div className='user-info-card-meta-block-container'>
                             <div>
-                                <u style={{color: '#1890ff'}}>Name:</u>
+                                <u style={{color: '#1890ff'}}>{t("table-columns.name")}:</u>
                                 <span style={{marginLeft:'20px'}}>{currentUserInfo.name}</span>
                             </div>
                             <div className='right-allight'>
                                 <u style={{color: '#1890ff', marginRight:'30px'}}>
-                                    {currentUserInfo.admin ? 'Admin:' : 'User:'}
+                                    {currentUserInfo.admin ? `${t("userManagment.admin")}:` : `${t("modal.user_")}:`}
                                 </u>
                                 <span style={{marginRight:'20px'}}>
                                     {currentUserInfo.admin ?
@@ -223,22 +225,22 @@ const UserManagement = () => {
                     }
                 />
             </Card>
-            <Title>Панель управления пользователями</Title>
+            <Title>{t("userManagment.title2")}</Title>
             <List
                 header={
                     <div className='user-list-header'>
                         <div className='user-list-info'>
                             <p style={{width:'7rem'}}><b>#</b></p>
-                            <p style={{width:'8rem', fontSize:'inherit'}}><b>Active</b></p>
-                            <p style={{width:'9.8rem', fontSize:'inherit'}}><b>Admin</b></p>
-                            <p style={{width:'13rem'}}><b>Login</b></p>
-                            <p><b>Name</b></p>
+                            <p style={{width:'8rem', fontSize:'inherit'}}><b>{t("userManagment.active")}</b></p>
+                            <p style={{width:'9.8rem', fontSize:'inherit'}}><b>{t("userManagment.admin")}</b></p>
+                            <p style={{width:'13rem'}}><b>{t("userManagment.login")}</b></p>
+                            <p><b>{t("userManagment.name")}</b></p>
                         </div>
                         <div className='button-container'>
                             {isAdmin ? (
                                 <Button icon={<UserAddOutlined />} onClick={handleRegistration}/>
                             ):(
-                                <span>доступ к добавлению/изменению пользователей только у админов</span>
+                                <span>{t("userManagment.right")}</span>
                             )}
                         </div>
                     </div>
@@ -292,7 +294,7 @@ const UserManagement = () => {
                             style={{fontSize:'20px'}}
                         />
                     ))}
-                        {' '}Удаление пользователя{' '} 
+                        {' '}{t("userManagment.delUser")}{' '} 
                         <u>{selectedUser ? selectedUser.login : ''}</u>
                     </>
                 }
@@ -305,14 +307,14 @@ const UserManagement = () => {
                                 key="delete" 
                                 danger 
                                 onClick={() => handleConfirmDelete(true)} 
-                                text="Удалить"
+                                text={t("userManagment.del")}
                             />
                             <Button 
                                 key="deactivate" 
                                 danger 
                                 type="default" 
                                 onClick={() => handleConfirmDelete(false)} 
-                                text="Деактивировать"
+                                text={t("userManagment.deactivate")}
                             />
                         </>
                     ) : (
@@ -320,24 +322,22 @@ const UserManagement = () => {
                             key="deactivate" 
                             type="primary" 
                             onClick={() => handleConfirmDelete(false)} 
-                            text="Деактивировать"
+                            text={t("userManagment.deactivate")}
                         />
                     ),
-                    <Button key="cancel" onClick={handleCancelDelete} text="Отмена"/>
+                    <Button key="cancel" onClick={handleCancelDelete} text={t("userManagment.cancel")}/>
                 ]}
             >
                 {selectedUser && selectedUser.extracts.length === 0 ? (
                     <p>
-                        Вы уверены, что хотите удалить пользователя <b>{selectedUser.login}</b>?
-                        Возможна деактивация пользователя без удаления!
+                        {t("userManagment.delUserConf1")} <b>{selectedUser.login}</b>?
+                        {t("userManagment.delUserConf2")}
                     </p>
                 ) : (
                     <p>
-                        Удаление данного пользователя невозможно,
-                        так как у него есть выписки 
+                        {t("userManagment.delUserConf3")}
                         <b>({selectedUser ? selectedUser.extracts.length : 0})</b>
-                        . Перед удалением пользователя необходимо удалить/изменить данные выписки.
-                        Возможна только деактивация пользователя. Деактивировать?
+                        {t("userManagment.delUserConf4")}
                     </p>
                 )}
             </Modal>
@@ -349,7 +349,7 @@ const UserManagement = () => {
                             twoToneColor="orange" 
                             style={{fontSize:'20px'}}
                         />
-                        {' '}{isRegistration ? 'Регистрация нового' : 'Редактирование'} пользователя{' '}
+                        {' '}{isRegistration ? t("userManagment.regNem") : t("userManagment.edit")} {t("userManagment.user_")}{' '}
                         <u style={{color:'blue'}}>{selectedUser?.login}</u>
                     </>
                 }
@@ -358,44 +358,44 @@ const UserManagement = () => {
                 onCancel={handleEditModalCancel}
             >
                 <Form className='edit-modal-content-container'>
-                    <Form.Item label="Login">
+                    <Form.Item label={t("userManagment.login")}>
                         <Input
-                            placeholder="Login"
+                            placeholder={t("userManagment.login")}
                             value={editedUser.login}
                             onChange={(e) => setEditedUser({ ...editedUser, login: e.target.value })}
                             style={{ marginBottom: '10px' }}
                         />
                     </Form.Item>
-                    <Form.Item label="Name">
+                    <Form.Item label={t("userManagment.name")}>
                         <Input
-                            placeholder="Name"
+                            placeholder={t("userManagment.name")}
                             value={editedUser.name}
                             onChange={(e) => setEditedUser({ ...editedUser, name: e.target.value })}
                             style={{ marginBottom: '10px' }}
                         />
                     </Form.Item>
-                    <Form.Item label="Password">
+                    <Form.Item label={t("userManagment.password")}>
                         <Input.Password
-                            placeholder="Password"
+                            placeholder={t("userManagment.password")}
                             value={editedUser.password}
                             onChange={(e) => setEditedUser({ ...editedUser, password: e.target.value })}
                             
                         />
                     </Form.Item>
-                    <Form.Item label="Active">
+                    <Form.Item label={t("userManagment.active")}>
                         <Checkbox
                             checked={editedUser.active}
                             onChange={(e) => setEditedUser({ ...editedUser, active: e.target.checked })}
                         >
-                            Активен
+                            {t("userManagment.active")}
                         </Checkbox>
                     </Form.Item>
-                    <Form.Item label="Admin">
+                    <Form.Item label={t("userManagment.admin")}>
                         <Checkbox
                             checked={editedUser.admin}
                             onChange={(e) => setEditedUser({ ...editedUser, admin: e.target.checked })}
                         >
-                            Админ
+                            {t("userManagment.admin")}
                         </Checkbox>
                     </Form.Item>
                 </Form>

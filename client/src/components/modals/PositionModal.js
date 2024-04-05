@@ -1,17 +1,19 @@
 import React from 'react';
 import { Modal, List, Empty, Button, Pagination } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
 
 const PositionModal = ({ visible, positions, onSelectPosition, onCancel, pagination, onPageChange, total }) => {
+    const { t } = useTranslation();
     return (
         <Modal
             open={visible}
-            title="Search Results"
+            title={t("positionConstructor.searchRes")}
             onCancel={onCancel}
             footer={null}
         >
             {positions.length === 0 ? (
-                <Empty description="There are no matches" />
+                <Empty description={t("positionConstructor.noMatches")} />
             ) : (
                 <>
                     <List
@@ -21,7 +23,7 @@ const PositionModal = ({ visible, positions, onSelectPosition, onCancel, paginat
                             <List.Item key={item.id}>
                                 <List.Item.Meta
                                     title={<span>{((pagination.current - 1) * pagination.pageSize) + index + 1}. {item.desc}</span>}
-                                    description={`Article: ${item.article}`}
+                                    description={`${t("table-columns.article")}: ${item.article}`}
                                 />
                                 <Button type="primary" icon={<PlusOutlined />} onClick={() => onSelectPosition(item)} />
                             </List.Item>

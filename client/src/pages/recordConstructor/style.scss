@@ -36,8 +36,9 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     .ant-checkbox-wrapper{
+        justify-content: center;
         span{
-            line-height: 28px;
+            line-height: 30px;
         }
     } 
 }

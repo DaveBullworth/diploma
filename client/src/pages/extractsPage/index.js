@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Card, Avatar, Switch, Empty, List, Pagination, Modal, Checkbox } from 'antd';
 import { PlusOutlined, CheckOutlined } from '@ant-design/icons';
 import { Button, notification } from '../../components/common/index';
@@ -15,6 +16,7 @@ import './style.scss'
 const { Meta } = Card;
 
 const Extracts = () => {
+    const { t } = useTranslation();
     const currentUserId = useSelector(state => state.user.user.id);
     const [currentUserInfo, setCurrentUserInfo] = useState({})
     const [id, setId] = useState(null);
@@ -131,7 +133,7 @@ const Extracts = () => {
             const modalContent = (
                 <>
                     {response.rows.length === 0 ? (
-                        <Empty description="There are no matches" />
+                        <Empty description={t("positionConstructor.noMatches")} />
                     ) : (
                         <>
                             <List
@@ -141,7 +143,7 @@ const Extracts = () => {
                                     <List.Item key={item.id}>
                                         <List.Item.Meta
                                             title={<span>{((pagination.current - 1) * pagination.pageSize) + index + 1}. {item.desc}</span>}
-                                            description={`Article: ${item.article}`}
+                                            description={`${t("table-columns.article")}: ${item.article}`}
                                         />
                                         {selectedPositions.some(selectedItem => selectedItem.id === item.id) ? (
                                             <CheckOutlined style={{ color: 'green' }} />
@@ -169,8 +171,8 @@ const Extracts = () => {
             console.error('Error fetching positions:', error);
             notification({
                 type: 'error',
-                message: 'Error!',
-                description: 'Failed to fetch Positions data!',
+                message: t("notification.error"),
+                description: t("notification.errorDesc1"),
             });
         }
     }, [pagination, selectedPositions, showModal]);
@@ -189,20 +191,20 @@ const Extracts = () => {
             <Card 
                 title={
                     <div>
-                        Каталог выписок{' '}
+                        {t("extractsPage.title1")}{' '}
                         <span style={{ color: id === currentUserId ? '#1890ff' : 'inherit', textDecoration: id === currentUserId ? 'underline' : 'none' }}>
-                            ваш
+                        {t("extractsPage.title2")}
                         </span>
                         /
                         <span style={{ color: id !== currentUserId ? '#1890ff' : 'inherit', textDecoration: id !== currentUserId ? 'underline' : 'none' }}>
-                            всех пользователей
+                        {t("extractsPage.title3")}
                         </span>
                         {/* Switch компонент */}
                         <Switch 
                             onChange={handleSwitchChange}
                             style={{ marginLeft: '10px' }} 
-                            checkedChildren="Ваш" 
-                            unCheckedChildren="Всех" 
+                            checkedChildren={t("extractsPage.switch1")}
+                            unCheckedChildren={t("extractsPage.switch2")}
                         />
                     </div>
                 }
@@ -212,7 +214,7 @@ const Extracts = () => {
                     title={
                         <div className='user-info-card-meta-block-container'>
                             <div>
-                                <u style={{color: '#1890ff'}}>Login:</u>
+                                <u style={{color: '#1890ff'}}>{t("userManagment.login")}:</u>
                                 <span style={{marginLeft:'20px'}}>{currentUserInfo.login}</span>
                             </div>
                             <div className='right-allight'>
@@ -224,11 +226,11 @@ const Extracts = () => {
                     description={
                         <div className='user-info-card-meta-block-container'>
                             <div>
-                                <u style={{color: '#1890ff'}}>Name:</u>
+                                <u style={{color: '#1890ff'}}>{t("table-columns.name")}:</u>
                                 <span style={{marginLeft:'20px'}}>{currentUserInfo.name}</span>
                             </div>
                             <div className='right-allight'>
-                                <u style={{color: '#1890ff', marginRight:'5px'}}>Extracts:</u>
+                                <u style={{color: '#1890ff', marginRight:'5px'}}>{t("extractsPage.extracts")}:</u>
                                 <span style={{marginRight:'25px'}}>{'['}{currentUserInfo.extract ? currentUserInfo.extract.length : 0}{']'}</span>
                             </div>
                         </div>
@@ -243,10 +245,10 @@ const Extracts = () => {
             {/* Поиск выписок по позициям */}
             <div className="search-container-extracts">
                 <div className='label-button'>
-                    <label>Поиск выписок по выбранным позициям:</label>
+                    <label>{t("extractsPage.title4")}:</label>
                     <Checkbox onChange={handleCheckboxChange}/>
                     {selectedPositions.length === 0 && isChecked && (
-                        <span style={{ color: 'red', marginLeft: '10px', lineHeight: '15px' }}>Не выбрана ни одна позиция</span>
+                        <span style={{ color: 'red', marginLeft: '10px', lineHeight: '15px' }}>{t("extractsPage.title5")}</span>
                     )}
                 </div>
                 <SearchContainer options={options()(TABLES.POSITION)} onSearch={fetchPositionsAndUpdateModal} />
@@ -260,7 +262,7 @@ const Extracts = () => {
             }
             <Modal
                 open={modalVisible}
-                title="Search Results"
+                title={t("positionConstructor.searchRes")}
                 onCancel={hideModal}
                 footer={null}
             >

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Input, Cascader } from 'antd';
+import { useTranslation } from 'react-i18next';
 const { Search } = Input;
 
 const SearchContainer = ({ options, onSearch }) => {
+    const { t } = useTranslation()
     const [searchValue, setSearchValue] = useState('');
     const [selectedOption, setSelectedOption] = useState([]);
 
@@ -35,14 +37,14 @@ const SearchContainer = ({ options, onSearch }) => {
             style={{width:'15rem'}}
             options={options}
             onChange={handleCascaderChange}
-            placeholder="Выберите параметр поиска"
+            placeholder={t("searchContainer.chooseParam")}
         />
     );
 
     return (
         <Search
-            placeholder="Введите текст для поиска"
-            enterButton="Поиск"
+            placeholder={t("searchContainer.chooseText")}
+            enterButton={t("searchContainer.search")}
             value={searchValue}
             onChange={handleInputChange}
             onSearch={handleSearch}

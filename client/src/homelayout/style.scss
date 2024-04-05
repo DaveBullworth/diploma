@@ -5,10 +5,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    .ant-select{
+      width: 60px;
+      margin-left: auto;
+    }
     .user-info{
+      display: flex;
       color: white;
+      align-items: center; 
       .ant-avatar{
         margin-bottom: 4px;
+        margin-left: 1rem;
         border: 2px solid white; 
       }
       .username{
@@ -20,4 +27,4 @@
       }
     }
   }
-}  
+} 

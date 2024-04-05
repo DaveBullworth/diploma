@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import { Modal, List, Empty, Button, Pagination } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
 
 const RecordModal = ({ visible, records, onSelectRecord, onCancel, pagination, onPageChange, total }) => {
+    const { t } = useTranslation();
     return (
         <Modal
             open={visible}
-            title="Record Results"
+            title={t("extractConstructor.recRes")}
             onCancel={onCancel}
             footer={null}
         >
             {records.length === 0 ? (
-                <Empty description="There are no matches" />
+                <Empty description={t("positionConstructor.noMatches")} />
             ) : (
                 <>
                     <List
@@ -21,7 +23,7 @@ const RecordModal = ({ visible, records, onSelectRecord, onCancel, pagination, o
                             <List.Item key={item.id}>
                                 <List.Item.Meta
                                     title={<span>{((pagination.current - 1) * pagination.pageSize) + index + 1}. {item.desc_fact}</span>}
-                                    description={`Количество: ${item.quantity} ${item.um} `}
+                                    description={`${t("table-columns.quantity")}: ${item.quantity} ${item.um} `}
                                 />
                                 <Button type="primary" icon={<PlusOutlined />} onClick={() => onSelectRecord(item)} />
                             </List.Item>

@@ -57,7 +57,7 @@ export const columns = (
         },
         {
             title:  i18n.t("table-columns.um"),
-            dataIndex: 'um',
+            dataIndex: ['um', 'name'],
             key: 'um',
         },
         {
@@ -103,13 +103,19 @@ export const columns = (
             key: 'number',
         },
         {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            ...getColumnSearchProps('id'),
+        },
+        {
             title: i18n.t("table-columns.user"),
             dataIndex: 'user',
             key: 'user',
             ...filterCategoriesOrUsers(TABLES.EXTRACT)
         },
         {
-            title: 'ID',
+            title: i18n.t("extractsPage.noER"),
             dataIndex: 'extracts',
             key: 'extracts',
         },
@@ -169,7 +175,7 @@ export const columns = (
         },
         {
             title: i18n.t("table-columns.um"),
-            dataIndex: 'um',
+            dataIndex: ['um', 'name'],
             key: 'um',
         },
         {
@@ -178,7 +184,7 @@ export const columns = (
             key: 'quantity_um',
             render: (quantity_um, record) => {
                 const displayQuantity = quantity_um !== 1 ?
-                    `${i18n.t("table-columns.by")} ${quantity_um} ${i18n.t("table-columns.in")} 1 ${record.um}` 
+                    `${i18n.t("table-columns.by")} ${quantity_um} ${i18n.t("table-columns.in")} 1 ${record.um.name}` 
                     : i18n.t("table-columns.apart");
                 return displayQuantity;
             },
@@ -248,8 +254,19 @@ export const columns = (
         },
         {
             title: i18n.t("table-columns.um"),
-            dataIndex: ['record', 'um'],
+            dataIndex: ['um', 'name'],
             key: 'um',
+        },
+        {
+            title: i18n.t("table-columns.QY"),
+            dataIndex: 'quantity_um',
+            key: 'quantity_um',
+            render: (quantity_um, record) => {
+                const displayQuantity = quantity_um !== 1 ?
+                    `${i18n.t("table-columns.by")} ${quantity_um} ${i18n.t("table-columns.in")} 1 ${record.um.name}` 
+                    : i18n.t("table-columns.apart");
+                return displayQuantity;
+            },
         },
         {
             title: i18n.t("table-columns.user"),
@@ -271,8 +288,7 @@ export const columns = (
                         if (column.key == 'name' 
                             || column.key == 'desc' 
                             || column.key == 'article' 
-                            || column.key == 'factory'
-                            || column.key == 'um') {
+                            || column.key == 'factory') {
                             return {
                                 ...column,
                                 ...getColumnSearchProps(column.dataIndex), 
@@ -303,7 +319,7 @@ export const columns = (
                 }
             case TABLES.RECORD:
                 return columnsRecords.map(column => {
-                    if ( column.key == 'desc_fact' || column.key == 'provider' || column.key == 'um') {
+                    if ( column.key == 'desc_fact' || column.key == 'provider' ) {
                         return {
                             ...column,
                             ...getColumnSearchProps(column.dataIndex + '-'),
@@ -347,7 +363,6 @@ export const columns = (
                 return columnsExtractRecords.map(column => {
                     if (column.key == 'desc' 
                         || column.key == 'desc_fact' 
-                        || column.key == 'um' 
                         || column.key == 'project') {
                         return {
                             ...column,

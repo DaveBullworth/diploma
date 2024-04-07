@@ -231,7 +231,7 @@ const Extracts = () => {
                             </div>
                             <div className='right-allight'>
                                 <u style={{color: '#1890ff', marginRight:'5px'}}>{t("extractsPage.extracts")}:</u>
-                                <span style={{marginRight:'25px'}}>{'['}{currentUserInfo.extract ? currentUserInfo.extract.length : 0}{']'}</span>
+                                <span style={{marginRight:'25px'}}>{'['}{currentUserInfo.extracts ? currentUserInfo.extracts.length : 0}{']'}</span>
                             </div>
                         </div>
                     }

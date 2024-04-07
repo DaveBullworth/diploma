@@ -94,7 +94,7 @@ const Position = () => {
                 <Descriptions.Item label={t("table-columns.article")}>{article}</Descriptions.Item>
                 <Descriptions.Item label={t("table-columns.desc")}>{desc}</Descriptions.Item>
                 <Descriptions.Item label={t("table-columns.factory")}>{factory}</Descriptions.Item>
-                <Descriptions.Item label={t("table-columns.quantity")}>{`${quantity} ${um}`}</Descriptions.Item>
+                <Descriptions.Item label={t("table-columns.quantity")}>{`${quantity} ${um.name}`}</Descriptions.Item>
             </Descriptions>
             {records.length > 0 && (            
                 <>

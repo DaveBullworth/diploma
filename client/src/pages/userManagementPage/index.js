@@ -236,7 +236,7 @@ const UserManagement = () => {
                             <p style={{width:'13rem'}}><b>{t("userManagment.login")}</b></p>
                             <p><b>{t("userManagment.name")}</b></p>
                         </div>
-                        <div className='button-container'>
+                        <div className={isAdmin?'button-container':'span-container'}>
                             {isAdmin ? (
                                 <Button icon={<UserAddOutlined />} onClick={handleRegistration}/>
                             ):(

@@ -23,7 +23,7 @@ const RecordModal = ({ visible, records, onSelectRecord, onCancel, pagination, o
                             <List.Item key={item.id}>
                                 <List.Item.Meta
                                     title={<span>{((pagination.current - 1) * pagination.pageSize) + index + 1}. {item.desc_fact}</span>}
-                                    description={`${t("table-columns.quantity")}: ${item.quantity} ${item.um} `}
+                                    description={`${t("table-columns.quantity")}: ${item.quantity} ${item.um.name} `}
                                 />
                                 <Button type="primary" icon={<PlusOutlined />} onClick={() => onSelectRecord(item)} />
                             </List.Item>

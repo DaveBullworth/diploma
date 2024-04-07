@@ -65,18 +65,23 @@ class ExtractController {
                 whereClause.id = { [Op.in]: id.id };
             }
             const extract = await Extract.findAndCountAll({
-                include: [{
-                    model: ExtractRecord,
-                    as: 'extractRecords'
-                }, {
-                    model: User, 
-                    attributes: ['login'], 
-                    required: true 
-                }],
+                include: [
+                    {
+                        model: ExtractRecord,
+                        as: 'extractRecords',
+                        attributes: ['id']
+                    }, 
+                    {
+                        model: User, 
+                        attributes: ['login'], 
+                        required: true 
+                    }
+                ],
                 where: whereClause,
-                limit, offset
+                limit, 
+                offset,
             })
-            return res.json(extract)
+            return res.json({ count: extract.rows.length, rows: extract.rows })
         } catch (error) {
             next(ApiError.badRequest(error.message))
         }

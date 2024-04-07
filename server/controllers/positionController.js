@@ -1,4 +1,4 @@
-const { Position, Record, Category } = require("../models/models")
+const { Position, Record, Category, UM } = require("../models/models")
 const { Op } = require('sequelize');
 const sequelize = require('../db');
 const ApiError = require('../error/apiError')
@@ -8,8 +8,8 @@ class PositionController {
         let token = '';
         if(req.token) token = req.token;
         try{
-            const {name, desc, article, factory, quantity, um, quantity_min, categoryId} = req.body
-            const position = await Position.create({name, desc, article, factory, quantity, um, quantity_min, categoryId})
+            const {name, desc, article, factory, quantity, umId, quantity_min, categoryId} = req.body
+            const position = await Position.create({name, desc, article, factory, quantity, umId, quantity_min, categoryId})
             return res.json({position, token})
         } catch (error) {
             next(ApiError.badRequest(error.message))
@@ -35,11 +35,21 @@ class PositionController {
                                 model: Category,
                                 attributes: ['name'],
                                 required: true
+                            },
+                            {
+                                model: UM,
+                                attributes: ['name'],
+                                required: true
                             }
                         ]
                     },
                     {
                         model: Category,
+                        attributes: ['name'],
+                        required: true
+                    },
+                    {
+                        model: UM,
                         attributes: ['name'],
                         required: true
                     }
@@ -67,7 +77,7 @@ class PositionController {
             if (filters) {
                 filters = JSON.parse(filters); // Парсим строку JSON
                 for (let key in filters) {
-                    if (key === 'categoryId') {
+                    if (key === 'categoryId' || key === 'umId') {
                         whereClause[key] = { [Op.eq]: filters[key] };
                     } else {
                         whereClause[key] = { [Op.like]: `%${filters[key]}%` };
@@ -106,6 +116,11 @@ class PositionController {
                 include: [
                     {
                         model: Category,
+                        attributes: ['name'],
+                        required: true
+                    },
+                    {
+                        model: UM,
                         attributes: ['name'],
                         required: true
                     }
@@ -147,7 +162,7 @@ class PositionController {
         }
         let token = '';
         if(req.token) token = req.token;
-        let {name, desc, article, factory, quantity, um, quantity_min, categoryId} = req.body;
+        let {name, desc, article, factory, quantity, umId, quantity_min, categoryId} = req.body;
         try {
             const position = await Position.findByPk(id);
             if (!position) {
@@ -168,8 +183,8 @@ class PositionController {
             if (quantity) {
                 position.quantity = quantity;
             }
-            if (um) {
-                position.um = um;
+            if (umId) {
+                position.umId = umId;
             }
             if (quantity_min) {
                 position.quantity_min = quantity_min;

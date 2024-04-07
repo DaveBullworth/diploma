@@ -6,7 +6,8 @@ import {
     ProfileOutlined, 
     ContactsOutlined,
     PlusOutlined,
-    SnippetsOutlined
+    SnippetsOutlined,
+    AuditOutlined
  } from '@ant-design/icons';
 import { ROUTES } from '../constants';
 import i18n from "../i18n";
@@ -27,6 +28,11 @@ const getMenuItems = () => {
             key: ROUTES.CATEGORIES,
             icon: <SnippetsOutlined />,
             label: <NavLink to={ROUTES.CATEGORIES}>{i18n.t('menu.categories')}</NavLink>,
+        },
+        {
+            key: ROUTES.UNITS,
+            icon: <AuditOutlined />,
+            label: <NavLink to={ROUTES.UNITS}>{i18n.t('menu.units')}</NavLink>,
         },
         {
             key: 'User',

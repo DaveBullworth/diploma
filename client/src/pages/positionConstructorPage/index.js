@@ -6,6 +6,7 @@ import { PlusOutlined, CheckOutlined, ArrowLeftOutlined, PlayCircleOutlined } fr
 import { notification, Button } from '../../components/common/index';
 import { options } from '../../components/searchContainer/config'
 import { fetchCategorys, createCategory } from '../../http/categorysAPI';
+import { fetchUMs, createUM } from '../../http/umAPI';
 import { fetchPositions, fetchOnePosition, createPosition, editPosition } from '../../http/positionsAPI';
 import { createPositionHierarchy, editPositionHierarchy, fetchPositionsHierarchy, deletePositionHierarchy } from '../../http/positionsHierarchyAPI';
 import './style.scss';
@@ -20,6 +21,7 @@ const PositionConstructor = ({update}) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
+    const [ums, setUMs] = useState([]);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 4 });
     const [selectedPositions, setSelectedPositions] = useState([]);
     const [inputValues, setInputValues] = useState({
@@ -29,7 +31,7 @@ const PositionConstructor = ({update}) => {
         article: null,
         factory: '',
         quantity: 0,
-        um: 'шт.',
+        um: '',
         quantity_min: 0
     });
     const [modalVisible, setModalVisible] = useState(false); // State to manage modal visibility
@@ -144,7 +146,7 @@ const PositionConstructor = ({update}) => {
                         article: response.article,
                         factory: response.factory,
                         quantity: response.quantity,
-                        um: response.um,
+                        um: response.um.name,
                         quantity_min: response.quantity_min
                     });
                     setSelectedPositions(response.ChildPositions)
@@ -159,10 +161,12 @@ const PositionConstructor = ({update}) => {
             }
         };
     
-        const fetchCategoriesData = async () => {
+        const fetchCategoriesUnitsData = async () => {
             try {
-                const response = await fetchCategorys();
-                setCategories(response);
+                const response1 = await fetchCategorys();
+                const response2 = await fetchUMs();
+                setCategories(response1);
+                setUMs(response2);
             } catch (error) {
                 notification({
                     type: 'error',
@@ -173,7 +177,7 @@ const PositionConstructor = ({update}) => {
             }
         };
         fetchPositionById(); 
-        fetchCategoriesData();
+        fetchCategoriesUnitsData();
     }, [id]);
 
     // Добавляем useEffect для отслеживания изменений в пагинации и обновления контента модального окна
@@ -197,6 +201,14 @@ const PositionConstructor = ({update}) => {
             }
     
             formData.categoryId = foundCategory.id;
+
+            let foundUM = ums.find(um => um.name === formData.um);
+            if (!foundUM) {
+                foundUM = await createUM({ name: formData.um });
+                setUMs(prevUMs => [...prevUMs, foundUM]);
+            }
+    
+            formData.umId = foundUM.id;
     
             if(update) {
                 const editedPosition = await editPosition(id, formData);
@@ -365,11 +377,17 @@ const PositionConstructor = ({update}) => {
             <div className="form-row">
                 <div className="form-group">
                     <label>{t("table-columns.um")}:</label>
-                    <Input 
-                        defaultValue="шт." 
-                        placeholder="шт." 
-                        value={inputValues.um} 
-                        onChange={e => handleInputChange('um', e.target.value)} 
+                    <AutoComplete
+                        options={ums.map(um => ({
+                            value: um.name,
+                            label: um.name
+                        }))}
+                        placeholder={t("positionConstructor.choose") + " " + t("table-info.um,name")}
+                        value={inputValues.um}
+                        onChange={value => handleInputChange('um', value)}
+                        filterOption={(inputValue, option) =>
+                            option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                        }
                     />
                 </div>
                 <div className="form-group">

@@ -101,6 +101,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             let filterObjectExtractRecord = {}
             let sortObject = {};
             let dateObject = {};
+            let extractsId_ = extractsId;
             // Формируем объект фильтров на основе состояния filters
             for (let key in filters) {
                 if (key.includes('-')) {
@@ -115,8 +116,9 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     filterObject = { ...filters }
                 }
             }
-            if (keyWord === TABLES.EXTRACT && id) {
-                filterObject.usersId = [id]
+            if (keyWord === TABLES.EXTRACT ) {
+                if(id) filterObject.usersId = [id]
+                if(filters.id) extractsId_ = {id: [parseInt(filters.id, 10)]};
             }
             if(filtersER) filterObjectExtractRecord = {... filtersER}; // Создаем пустой объект для фильтров
             for (let key in sort) {
@@ -173,7 +175,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         pagination.pageSize,
                         filterObject,
                         dateObject,
-                        extractsId
+                        extractsId_
                     );
                     newData = response.rows.map(row => ({
                         id: row.id,
@@ -336,7 +338,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     for (const extract of response1.rows) {
                         const response2 = await fetchOneRecord(extract.recordId);
                         const response3 = await fetchOnePosition(response2.positionId);
-                        const newQuantity = response3.quantity + (extract.quantity * response2.quantity_um);
+                        const newQuantity = response3.quantity + (extract.quantity * extract.quantity_um);
                         await editPosition(response3.id, { quantity: newQuantity });
                         await deleteExtractRecord(extract.id);
                     }
@@ -350,31 +352,65 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             notification({
                 type: 'success',
                 message: t("notification.success"),
-                description: `${keyWord.slice(0, -1).toLowerCase()} ${t("notification.successDesc3")}!`,
+                description: `${keyWord.slice(0, -1).toLowerCase()} #${id} ${t("notification.successDesc3")}!`,
             });
         } catch (err) {
             console.error(err);
             notification({
                 type: 'error',
                 message: t("notification.error"),
-                description: `${t("notification.errorDesc5")} ${toDescription}: ${err.message}`,
+                description: `${t("notification.errorDesc5")} #${id} ${toDescription}: ${err.message}`,
             });
         } finally {
             setLoading(false)
         }
     };
 
-    const showConfirm = (id, name) => {
-        const content = `${t("modal.sureDel")}: ${name} ${t(`notification.${keyWord.slice(0, -1).toLowerCase()}`)}?`;
+    const showConfirm = async (id, name) => {
+        let content = `${t("modal.sureDel")}: ${name} ${t(`notification.${keyWord.slice(0, -1).toLowerCase()}`)}`;
+        let flag = false;
+        let okButtonProps = {};
+    
+        if (keyWord === TABLES.RECORD) {
+            const filter = { recordsId: [id] };
+            const response = await fetchExtractRecords(null, null, null, filter);
+    
+            if (response.rows.length > 0) {
+                flag = true;
+                const extractsInfo = response.rows.map(row => `#${row.extract.id} (${row.extract.user.login})`).join(', ');
+                content = (
+                    <span>
+                        {t("modal.delNot1")} <strong>{extractsInfo}</strong> {t("modal.delNot2")}
+                    </span>
+                );
+                okButtonProps = { style: { display: 'none' } };
+            }
+        }
+
+        if (keyWord === TABLES.POSITION) {
+            const response = await fetchRecords(null, null, id);
+            if (response.rows.length > 0) {
+                flag = true;
+                const recordsInfo = response.rows.map(row => `#${row.id} (${row.desc_fact})`).join(', ');
+                content = (
+                    <span>
+                        {t("modal.delNot3")} <strong>{recordsInfo}</strong> {t("modal.delNot4")}
+                    </span>
+                );
+                okButtonProps = { style: { display: 'none' } };
+            }
+        }
+    
         Modal({
-          type: 'confirm',
-          title: t("modal.confirm"),
-          content,
-          onOk() {
-            handleDelete(id)
-          },
+            type: 'confirm',
+            title: t("modal.confirm"),
+            content,
+            onOk() {
+                if (!flag) handleDelete(id);
+            },
+            okButtonProps,
         });
-    };
+    };    
 
     const filterExtractRecords = async () => {
         let newFilters = {}
@@ -498,6 +534,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
         filterDropdown: ({ setSelectedKeys, confirm }) => (
             <div className="search-container">
                 <Input
+                    type={dataIndex === 'id' ? 'number' : 'text'}
                     ref={searchInputRef}
                     placeholder={`${t(`table-info.${dataIndex.includes('-')?dataIndex.replace('-', ''):dataIndex}`)}`}
                     value={filters[dataIndex]}

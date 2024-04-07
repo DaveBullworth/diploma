@@ -65,7 +65,7 @@ const Extract = () => {
             for (const extract of response1.rows) {
                 const response2 = await fetchOneRecord(extract.recordId);
                 const response3 = await fetchOnePosition(response2.positionId);
-                const newQuantity = response3.quantity + (extract.quantity * response2.quantity_um);
+                const newQuantity = response3.quantity + (extract.quantity * extract.quantity_um);
                 await editPosition(response3.id, { quantity: newQuantity });
                 await deleteExtractRecord(extract.id);
             }
@@ -75,7 +75,7 @@ const Extract = () => {
             notification({
                 type: 'success',
                 message: t("notification.success"),
-                description: `${id} ${t("extractPage.extract")} ${t("notification.successDesc3")}!`,
+                description: `${t("extractPage.extract")} #${id} ${t("notification.successDesc3")}!`,
             });
     
             navigate(ROUTES.EXTRACTS);

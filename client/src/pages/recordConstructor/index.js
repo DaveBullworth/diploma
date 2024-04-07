@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Typography, Input, DatePicker, InputNumber, Divider, Tooltip, Checkbox } from 'antd';
+import { Typography, Input, DatePicker, InputNumber, Divider, Tooltip, Checkbox, AutoComplete } from 'antd';
 import { CloseCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { ROUTES } from '../../constants';
 import { Button, Spin, notification } from '../../components/common/index';
+import { fetchUMs, createUM } from '../../http/umAPI';
 import { createRecord, fetchOneRecord, editRecord } from '../../http/recordsAPI';
 import { fetchOnePosition, editPosition } from '../../http/positionsAPI';
 import dayjs from 'dayjs'; // Import dayjs library
@@ -23,7 +24,11 @@ const RecordConstructor = ({update}) => {
     const [loading, setLoading] = useState(false);
     const [copyFromPrevious, setCopyFromPrevious] = useState(false);
     const [recordIndex, setRecordIndex] = useState(null);
-    const [positionData, setPositionData] = useState({});
+    const [positionData, setPositionData] = useState({
+        um: {
+            name: ''
+        }
+    });
     const [formDataArray, setFormDataArray] = useState([{
         desc_fact: '',
         quantity: 0,
@@ -32,6 +37,7 @@ const RecordConstructor = ({update}) => {
         provider: '',
         date: dayjs(), 
     }]);
+    const [ums, setUMs] = useState([]);
 
     const handleInputChange = (index, key, value) => {
         const newDataArray = [...formDataArray];
@@ -49,7 +55,7 @@ const RecordConstructor = ({update}) => {
         const newData = copyFromPrevious ? { ...formDataArray[formDataArray.length - 1] } : {
             desc_fact: '',
             quantity: 0,
-            um: positionData.um,
+            um: positionData.um.name,
             quantity_um: 1,
             provider: '',
             date: dayjs(), 
@@ -78,6 +84,12 @@ const RecordConstructor = ({update}) => {
                     date: formData.date.format('YYYY-MM-DD HH:mm:ss'), // Format date before sending
                     positionId: id
                 };
+                let foundUM = ums.find(um => um.name === formData.um);
+                if (!foundUM) {
+                    foundUM = await createUM({ name: formData.um });
+                    setUMs(prevUMs => [...prevUMs, foundUM]);
+                }
+                data.umId = foundUM.id;
                 if (update) {
                     data.positionId = positionData.id
                     await editRecord(id, data);
@@ -95,7 +107,7 @@ const RecordConstructor = ({update}) => {
             if (!update) setFormDataArray([{
                 desc_fact: '',
                 quantity: 0,
-                um: positionData.um,
+                um: positionData.um.name,
                 quantity_um: 1,
                 provider: '',
                 date: dayjs(), 
@@ -127,18 +139,24 @@ const RecordConstructor = ({update}) => {
             try {
                 let positionData = {};
                 setLoading(true)
+                const response = await fetchUMs();
+                setUMs(response);
                 if (update) {
                     const recordData = await fetchOneRecord(id);
                     recordData.date = dayjs(recordData.date);
                     positionData = await fetchOnePosition(recordData.positionId)
                     setRecordIndex(positionData.records.findIndex(record => record.id == id))
                     setFormDataArray([recordData]); // Установка данных записи
+                    setFormDataArray(prevState => prevState.map(formData => ({
+                        ...formData,
+                        um: recordData.um.name // устанавливаем um из полученных данных о позиции
+                    })));
                 } else {
                     positionData = await fetchOnePosition(id);
                     // Установка значения um в formDataArray
                     setFormDataArray(prevState => prevState.map(formData => ({
                         ...formData,
-                        um: positionData.um // устанавливаем um из полученных данных о позиции
+                        um: positionData.um.name // устанавливаем um из полученных данных о позиции
                     })));
                 }
                 setPositionData(positionData); // Установка названия позиции в состояние
@@ -204,10 +222,24 @@ const RecordConstructor = ({update}) => {
                                 </div>
                                 <div className="form-group">
                                     <label>{t("recordConstructor.um")}:</label>
-                                    <Input 
-                                        placeholder={t("positionConstructor.enter") + " " + t("recordConstructor.um_")}
-                                        value={formData.um} 
-                                        onChange={e => handleInputChange(index, 'um', e.target.value)} 
+                                    <AutoComplete
+                                        options={ums.map(um => ({
+                                            value: um.name,
+                                            label: um.name
+                                        }))}
+                                        placeholder={t("positionConstructor.choose") + " " + t("table-info.um,name")}
+                                        value={formData.um}
+                                        onChange={
+                                            value => {
+                                                handleInputChange(index, 'um', value)
+                                                if (formData.um === positionData.um.name){
+                                                    handleInputChange(index, 'quantity_um', 1 );
+                                                }
+                                            }
+                                        }
+                                        filterOption={(inputValue, option) =>
+                                            option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                        }
                                     />
                                 </div>
                                 <div className="form-group">
@@ -216,6 +248,7 @@ const RecordConstructor = ({update}) => {
                                         type='number'
                                         value={formData.quantity_um}
                                         onChange={value => handleInputChange(index, 'quantity_um', value)}
+                                        disabled={formData.um === positionData.um.name}
                                     />
                                 </div>
                                 <div className="form-group">

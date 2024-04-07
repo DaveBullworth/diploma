@@ -9,7 +9,8 @@
         "user": "USER",
         "usersPanel": "USERS PANEL",
         "extracts": "EXTRACTS",
-        "addExtract": "ADD EXTRACT"
+        "addExtract": "ADD EXTRACT",
+        "units" : "UNIT SYSTEM"
     },
     "table-info": {
         "filters": "Filters",
@@ -20,7 +21,7 @@
         "desc_fact" : "description",
         "factory" : "factory",
         "article" : "article",
-        "um" : "u.m.",
+        "um,name" : "u.m.",
         "category": "category",
         "shortage": "shortage",
         "quantity": "quantity",
@@ -28,7 +29,8 @@
         "record,position,desc+" : "description(position)",
         "record,desc_fact+" : "description(record)",
         "record,um+" : "u.m.(record)",
-        "project+" : "project"
+        "project+" : "project",
+        "id" : "search by id"
     },
     "extractRecordFilters": {
         "project" : "project",
@@ -104,6 +106,8 @@
         "errorDesc8" : "Failed to edit category",
         "errorDesc9" : "An error occurred while register",
         "errorDesc10" : "Failed to",
+        "errorDesc11" : "Failed to edit unit",
+        "errorDesc12" : "Failed to edit unit",
         "successDesc1" : "New Position added successfully!",
         "successDesc2" : " position deleted successfully!",
         "successDesc3" : " deleted successfully!",
@@ -123,20 +127,34 @@
         "attention" : "Attention",
         "sureDel" : "Sure to delete",
         "editCat" : "Edit category ",
+        "editUM" : "Edit unit ",
         "delCat" : "Delete category ",
+        "delUM" : "Delete unit ",
         "confEditCat1" : "Confirm category name change",
+        "confEditUM1" : "Confirm unit name change",
         "confEditCat2" : "Are you sure you want to change the category name ",
-        "itWillLead" : "It will lead to change",
+        "confEditUM2" : "Are you sure you want to change the unit name ",
+        "itWillLead" : "It will lead to change: ",
         "catHave1" : "Category has",
+        "umHave1" : "Unit has ",
+        "umHave2" : "owned positions",
+        "umHave3" : "owned records",
+        "umHave4" : "owned extract records",
+        "umHave5" : "This category cannot be deleted.",
         "catHave2" : "owned positions. This category cannot be deleted.",
         "confDelCat" : "Are you sure you want to delete this category?",
+        "confDelUM" : "Are you sure you want to delete this unit?",
         "regNew" : "registration of a new",
         "edit" : "edition",
         "user" : "user",
         "user_" : "User",
         "reged" : "registered",
         "edited" : "edited",
-        "decline" : "Cancel"
+        "decline" : "Cancel",
+        "delNot1" : "There are extracts with its use (extract records) for this record:",
+        "delNot2" : "before deleting an 'record', you need to change these 'extracts'!",
+        "delNot3" : "There are 'records' with its use for this 'position':",
+        "delNot4" : "before deleting an 'position', you need to change/delete these 'records'!"
     },
     "positionPage" : {
         "position" : "Position",
@@ -199,7 +217,8 @@
         "title5" : "No positions selected",
         "switch1" : "Your",
         "switch2" : "All",
-        "extracts" : "Extracts"
+        "extracts" : "Extracts",
+        "noER": "N-O ER"
     },
     "extractPage" : {
         "extract" : "extract",
@@ -236,6 +255,17 @@
         "chooseRec" : "Select an entry for extract",
         "addRec" : "Add another record",
         "noRec" : "Record not selected",
-        "recRes" : "Records Results"
+        "recRes" : "Records Results",
+        "quantity_um" : "Ratio",
+        "umP" : "U.M. Position",
+        "quantity_umR" : "Ratio",
+        "inone" : "in 1"
+    },
+    "unitPage" : {
+        "title" : "Units of Measurement Panel",
+        "records" : "records",
+        "extractRecords" : "extract records",
+        "no_rec" : "N-O records",
+        "no_ER" : "N-O extract records"
     }
 } 

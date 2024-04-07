@@ -1,6 +1,7 @@
 export const ROUTES = {
     LOGIN: '/login',
     CATEGORIES: '/categories',
+    UNITS: '/units',
     POSITIONS: '/position', //изначальная (таблица всех позиций)
     POSITION: '/position/:id', //смотреть/менять конкретную позицию
     CREATE_POSITION: '/position/new', //конструктор создания позиции

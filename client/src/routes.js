@@ -10,6 +10,7 @@ import ExtractConstructor from './pages/extractConstructorPage';
 import UserManagement from './pages/userManagementPage'
 import RecordConstructor from './pages/recordConstructor'
 import Categories from './pages/categoriesPage';
+import Units from './pages/unitsPage';
 import LoginPage from './pages/loginPage';
 
 export const routes = [
@@ -19,6 +20,10 @@ export const routes = [
         {
           path: ROUTES.CATEGORIES,
           element: <Categories />,
+        },
+        {
+          path: ROUTES.UNITS,
+          element: <Units />,
         },
         {
           path: ROUTES.POSITIONS,

@@ -1,12 +1,12 @@
-const { ExtractRecord, Record, Position, User, Extract } = require("../models/models")
+const { ExtractRecord, Record, Position, User, Extract, UM } = require("../models/models")
 const ApiError = require('../error/apiError')
 const { Op } = require('sequelize');
 
 class ExtractRecordController {
     async create(req, res, next) {
         try{
-            const {quantity, project, extractId, recordId} = req.body
-            const extractRecord = await ExtractRecord.create({quantity, project, extractId, recordId})
+            const {quantity, project, quantity_um, extractId, umId, recordId} = req.body
+            const extractRecord = await ExtractRecord.create({quantity, project, quantity_um, extractId, umId, recordId})
             return res.json(extractRecord)
         } catch (error) {
             next(ApiError.badRequest(error.message))
@@ -23,8 +23,13 @@ class ExtractRecordController {
                 where: { id },
                 include: [
                     {
+                        model: UM,
+                        attributes: ['name'],
+                        required: true
+                    },
+                    {
                         model: Record,
-                        attributes: ['desc_fact', 'um'],
+                        attributes: ['desc_fact'],
                         include: [
                             {
                                 model: Position,
@@ -66,8 +71,10 @@ class ExtractRecordController {
             if (filters) {
                 filters = JSON.parse(filters); // Парсим строку JSON
                 for (let key in filters) {
-                    if (key === 'recordsId') {
+                    if (key === 'recordsId' ) {
                         whereClause.recordId = { [Op.in]: filters.recordsId };
+                    } else if (key === 'umId') {
+                        whereClause[key] = { [Op.eq]: filters[key] };
                     } else {
                         whereClause[key] = { [Op.like]: `%${filters[key]}%` };
                     }
@@ -87,12 +94,21 @@ class ExtractRecordController {
             const extractRecord = await ExtractRecord.findAndCountAll({
                 include: [
                     {
+                        model: UM,
+                        attributes: ['name'],
+                        required: true
+                    },
+                    {
                         model: Record,
-                        attributes: ['desc_fact', 'um'],
+                        attributes: ['desc_fact'],
                         include: [
                             {
                                 model: Position,
                                 attributes: ['desc']
+                            },
+                            {
+                                model: UM,
+                                attributes: ['name']
                             }
                         ]
                     },
@@ -139,7 +155,7 @@ class ExtractRecordController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке изменить запись выписки)'))
         }
-        let {quantity, project, extractId, recordId} = req.body;
+        let {quantity, project, quantity_um, umId, extractId, recordId} = req.body;
         try {
             const extractRecord = await ExtractRecord.findByPk(id);
             if (!extractRecord) {
@@ -150,6 +166,12 @@ class ExtractRecordController {
             }
             if (project) {
                 extractRecord.project = project;
+            }
+            if (quantity_um) {
+                extractRecord.quantity_um = quantity_um;
+            }
+            if (umId) {
+                extractRecord.umId = umId;
             }
             if (extractId) {
                 extractRecord.extractId = extractId;

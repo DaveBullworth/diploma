@@ -36,7 +36,7 @@
     
                     label {
                         text-align: center;
-                        width: 23%;
+                        width: 32%;
                         margin-right: 10px;
                     }
     
@@ -47,7 +47,40 @@
                     .ant-input-number {
                         flex: 1;
                     }
+
+                    .ant-select {
+                        width: 45%;
+                    }
+
+                    .um-ratio-container {
+                        display: flex;
+                        align-items: center;
+                        width: 66%;
+                        label{
+                            padding-left: 3rem;
+                            width: auto;
+                        }
+                        .ant-input-number{
+                            width: auto;
+                        }
+                    }
                 }
+                .ant-card {
+                    height: fit-content;
+                    margin-top: 0.6rem;
+                    .ant-card-head {
+                        min-height: 40px;
+                        .ant-card-head-wrapper {
+                            .ant-card-head-title {
+                                font-size: 20px;
+                            }
+                        }
+                    }
+                    .ant-card-body {
+                        padding: 0.3rem!important;
+                    }
+                }
+                
             }
         }
     }

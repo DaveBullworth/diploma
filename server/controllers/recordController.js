@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const {Record} = require('../models/models')
+const {Record, UM} = require('../models/models')
 const ApiError = require('../error/apiError')
 
 class RecordController {
@@ -7,8 +7,8 @@ class RecordController {
         let token = '';
         if(req.token) token = req.token;
         try{
-            const {desc_fact, quantity, um, quantity_um, provider, date, positionId} = req.body
-            const record = await Record.create({desc_fact, quantity, um, quantity_um, provider, date, positionId})
+            const {desc_fact, quantity, umId, quantity_um, provider, date, positionId} = req.body
+            const record = await Record.create({desc_fact, quantity, umId, quantity_um, provider, date, positionId})
             return res.json({record, token})
         } catch (error) {
             next(ApiError.badRequest(error.message))
@@ -21,7 +21,16 @@ class RecordController {
             return next(ApiError.badRequest('Не передан ID!(при попытке получить запись)'))
         }
         try {
-            const record = await Record.findOne({where:{id}})
+            const record = await Record.findOne({
+                where:{id},
+                include: [
+                    {
+                        model: UM,
+                        attributes: ['name'],
+                        required: true
+                    }
+                ]
+            })
             if(!record){"Position not found!"}
             return res.json(record)
         } catch (error) {
@@ -48,10 +57,25 @@ class RecordController {
             if (filters) {
                 filters = JSON.parse(filters); // Парсим строку JSON
                 for (let key in filters) {
-                    whereClause[key] = { [Op.like]: `%${filters[key]}%` };
+                    if (key === 'umId') {
+                        whereClause[key] = { [Op.eq]: filters[key] };
+                    } else {
+                        whereClause[key] = { [Op.like]: `%${filters[key]}%` };
+                    }
                 }
             }
-            const record = await Record.findAndCountAll({ where: whereClause, limit, offset }); // Добавляем фильтр к запросу
+            const record = await Record.findAndCountAll({
+                where: whereClause,
+                include: [
+                    {
+                        model: UM,
+                        attributes: ['name'],
+                        required: true
+                    }
+                ],
+                limit,
+                offset 
+            }); // Добавляем фильтр к запросу
             return res.json(record);
         } catch (error) {
             next(ApiError.badRequest(error.message));
@@ -84,7 +108,7 @@ class RecordController {
         }
         let token = '';
         if(req.token) token = req.token;
-        let {desc_fact, quantity, um, quantity_um, provider, date, positionId} = req.body;
+        let {desc_fact, quantity, umId, quantity_um, provider, date, positionId} = req.body;
         try {
             const record = await Record.findByPk(id);
             if (!record) {
@@ -96,8 +120,8 @@ class RecordController {
             if (quantity) {
                 record.quantity = quantity;
             }
-            if (um) {
-                record.um = um;
+            if (umId) {
+                record.umId = umId;
             }
             if (quantity_um) {
                 record.quantity_um = quantity_um;

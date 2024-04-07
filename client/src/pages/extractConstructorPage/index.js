@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { Card, Avatar, Typography, Input, InputNumber, DatePicker } from 'antd';
+import { Card, Avatar, Typography, Input, InputNumber, DatePicker, AutoComplete } from 'antd';
 import { WarningTwoTone, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import { fetchOneUser } from '../../http/userAPI'
+import { fetchUMs, createUM } from '../../http/umAPI';
 import { fetchPositions, fetchOnePosition, editPosition } from "../../http/positionsAPI"
 import { fetchOneRecord, fetchRecords } from "../../http/recordsAPI"
 import { createExtract, editExtract, fetchOneExtract, deleteExtract } from "../../http/extractsAPI"
@@ -32,6 +33,7 @@ const ExtractConstructor = ({update}) => {
     // Получение данных о текущем пользователе из Redux store
     const currentUserId = useSelector(state => state.user.user.id);
 
+    const [ums, setUMs] = useState([]);
     const [creationDate, setCreationDate] = useState(dayjs())
     const [formDataArray, setFormDataArray] = useState([
         {
@@ -39,6 +41,8 @@ const ExtractConstructor = ({update}) => {
             quantity: 0,
             recordId: null,
             desc_fact: '',
+            quantity_um: 1,
+            quantity_umR: 1,
             quantity_r: 0,
             quantity_left: 0,
             um: '',
@@ -56,8 +60,8 @@ const ExtractConstructor = ({update}) => {
     const [selectedPosition, setSelectedPosition] = useState(null);
     const [positions, setPositions] = useState([]);
     const [records, setRecords] = useState([]);
-    const [positionPagination, setPositionPagination] = useState({ current: 1, pageSize: 2 });
-    const [recordPagination, setRecordPagination] = useState({ current: 1, pageSize: 1 });
+    const [positionPagination, setPositionPagination] = useState({ current: 1, pageSize: 3 });
+    const [recordPagination, setRecordPagination] = useState({ current: 1, pageSize: 4 });
     const [totalResponse, setTotalResponse] = useState([0,0])
     // Хранение индекса текущего блока поиска
     const [currentSearchBlockIndex, setCurrentSearchBlockIndex] = useState(null); 
@@ -81,7 +85,7 @@ const ExtractConstructor = ({update}) => {
             for (const extract of response1.rows) {
                 const response2 = await fetchOneRecord(extract.recordId);
                 const response3 = await fetchOnePosition(response2.positionId);
-                const newQuantity = response3.quantity + (extract.quantity * response2.quantity_um);
+                const newQuantity = response3.quantity + (extract.quantity * extract.quantity_um);
                 await editPosition(response3.id, { quantity: newQuantity });
                 await deleteExtractRecord(extract.id);
             }
@@ -123,6 +127,7 @@ const ExtractConstructor = ({update}) => {
 
     const handleSelectRecord = async (record) => {
         try {
+            const position = await fetchOnePosition(record.positionId)
             const updatedFormDataArray = formDataArray.map((formData, index) => {
                 if (index === currentSearchBlockIndex) {
                     return {
@@ -130,7 +135,9 @@ const ExtractConstructor = ({update}) => {
                         recordId: record.id,
                         desc_fact: record.desc_fact,
                         quantity_r: record.quantity,
-                        um: record.um,
+                        quantity_umR: record.quantity_um,
+                        umR: record.um.name,
+                        umP: position.um.name,
                         provider: record.provider,
                         date: record.date,
                     };
@@ -145,7 +152,7 @@ const ExtractConstructor = ({update}) => {
             const response = await fetchExtractRecords(null, null, null, filter);
             
             // Суммирование количества использованных записей
-            const quantity_gone = response.rows.reduce((total, extractRecord) => total + extractRecord.quantity, 0);
+            const quantity_gone = response.rows.reduce((total, extractRecord) => total + extractRecord.quantity*(extractRecord.quantity_um/record.quantity_um), 0);
             
             // Обновление значения поля quantity_left
             const updatedFormDataArrayWithQuantityLeft = updatedFormDataArray.map(formData => {
@@ -221,11 +228,29 @@ const ExtractConstructor = ({update}) => {
 
     useEffect(() => {
         fetchCurrentUserInfo();
+        fetchUMsData();
         if (update) {
             fetchExtractData();
             fetchExtractRecordsData();
         }
     }, []);
+
+    const fetchUMsData = async () => {
+        try {
+            setLoading(true)
+            const response = await fetchUMs();
+            setUMs(response);
+        } catch (error) {
+            console.error('Ошибка при получении данных ед.изм.:', error);
+            notification({
+                type: 'error',
+                message: t("notification.error"),
+                description: t("notification.errorDesc7"),
+            });
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const fetchExtractData = async () => {
         try {
@@ -244,17 +269,22 @@ const ExtractConstructor = ({update}) => {
             const newDataArray = [];
             for (const ER of response2.rows) {
                 const response3 = await fetchOneRecord(ER.recordId);
+                const response4 = await fetchOnePosition(response3.positionId);
                 const filter = { recordsId: [ER.recordId] };
                 const response = await fetchExtractRecords(null, null, null, filter);
-                const quantity_gone = response.rows.reduce((total, extractRecord) => total + extractRecord.quantity, 0);
+                const quantity_gone = response.rows.reduce((total, extractRecord) => total + extractRecord.quantity*(extractRecord.quantity_um/response3.quantity_um), 0);
                 const data = {
                     project: ER.project,
                     quantity: ER.quantity,
                     recordId: ER.recordId,
+                    quantity_um: ER.quantity_um,
                     desc_fact: response3.desc_fact,
                     quantity_r: response3.quantity,
-                    quantity_left: response3.quantity - quantity_gone,
-                    um: response3.um,
+                    quantity_left: response3.quantity - quantity_gone + ER.quantity*(ER.quantity_um/response3.quantity_um),
+                    quantity_umR: response3.quantity_um,
+                    um: ER.um.name,
+                    umR: response3.um.name,
+                    umP: response4.um.name,
                     provider: response3.provider,
                     date: response3.date
                 };
@@ -292,6 +322,8 @@ const ExtractConstructor = ({update}) => {
             {
                 project: '',
                 quantity: 0,
+                quantity_um: 1,
+                quantity_umR: 1,
                 recordId: null,
                 desc_fact: '',
                 quantity_r: 0,
@@ -367,8 +399,8 @@ const ExtractConstructor = ({update}) => {
             }
     
             // Проверка наличия записей с quantity больше, чем quantity_left
-            if (formDataArray.some(formData => formData.quantity > formData.quantity_left)) {
-                throw new Error(t("extractConstructor.err3") + (update ? t("extractConstructor.mod") : t("extractConstructor.create")) + t("extractConstructor.errTitle2"));
+            if (formDataArray.some(formData => formData.quantity > formData.quantity_left*formData.quantity_umR)) {
+                throw new Error(t("extractConstructor.err3") + " " + (update ? t("extractConstructor.mod") : t("extractConstructor.create")) + " " + t("extractConstructor.errTitle2"));
             }
     
             let newExtract = {};
@@ -388,6 +420,8 @@ const ExtractConstructor = ({update}) => {
             if (!update) setFormDataArray([{
                 project: '',
                 quantity: 0,
+                quantity_um: 1,
+                quantity_umR: 1,
                 recordId: null,
                 desc_fact: '',
                 quantity_r: 0,
@@ -399,13 +433,13 @@ const ExtractConstructor = ({update}) => {
             notification({
                 type: 'success',
                 message: t("notification.success"),
-                description: t("notification.extract") + (update ? t("extractConstructor.mod_") : t("extractConstructor.create_")) + t("notification.successDesc3"),
+                description: t("notification.extract") + " " + (update ? t("extractConstructor.mod_") : t("extractConstructor.create_")) + " " + t("notification.success_"),
             });
         } catch (error) {
             console.error(t("notification.error_") + (update ? t("extractConstructor.mod")  : t("extractConstructor.create")) + ' выписки:', error);
             notification({
                 type: 'error',
-                message: t("notification.errorDesc10") + (update ? t("extractConstructor.mod__") : t("extractConstructor.edit__")) + t("extractConstructor.extract"),
+                message: t("notification.errorDesc10") + " " + (update ? t("extractConstructor.mod__") : t("extractConstructor.create__")) + " " + t("extractConstructor.extract"),
                 description: error.message,
             });
         } finally {
@@ -417,22 +451,57 @@ const ExtractConstructor = ({update}) => {
         try {
             if (update) {
                 const savedER = []; // Массив для хранения id сохраненных записей
-                await Promise.all(formDataArray.map(async (formData) => {
+                const response1 = await fetchExtractRecords(null, null, extractId);
+                const existingRecords = response1.rows;
+
+                for (const existingRecord of existingRecords) {
+                    const match = formDataArray.find(formData => 
+                        formData.quantity === existingRecord.quantity && 
+                        formData.quantity_um === existingRecord.quantity_um && 
+                        formData.umId === existingRecord.umId && 
+                        formData.project === existingRecord.project &&
+                        formData.recordId === existingRecord.recordId
+                    );
+    
+                    if (!match) {
+                        // Обновляем количество для соответствующей позиции
+                        const recordExtractRecord = await fetchOneRecord(existingRecord.recordId);
+                        const positionExtractRecord = await fetchOnePosition(recordExtractRecord.positionId);
+                        const newQuantity = positionExtractRecord.quantity + (existingRecord.quantity * existingRecord.quantity_um);
+                        await editPosition(positionExtractRecord.id, { quantity: newQuantity });
+    
+                        // Удаляем запись
+                        await deleteExtractRecord(existingRecord.id);
+                    }
+                }
+
+                for (const formData of formDataArray) {
+                    let foundUM = ums.find(um => um.name === formData.um);
+                    if (!foundUM) {
+                        foundUM = await createUM({ name: formData.um });
+                        setUMs(prevUMs => [...prevUMs, foundUM]);
+                    }
+                    formData.umId = foundUM.id;
+    
                     const data = {
                         quantity: formData.quantity,
                         project: formData.project,
                         extractId: extractId,
                         recordId: formData.recordId,
+                        umId: formData.umId,
+                        quantity_um: formData.quantity_um
                     };
-        
+    
                     // Проверяем существует ли запись в выписке с такими же данными
                     const response1 = await fetchExtractRecords(null, null, extractId);
                     const existingRecord = response1.rows.find(record => 
                         record.quantity === data.quantity && 
+                        record.quantity_um === data.quantity_um && 
+                        record.umId === data.umId && 
                         record.project === data.project &&
                         record.recordId === data.recordId
                     );
-        
+    
                     let recordIdToAdd;
                     if (existingRecord) {
                         recordIdToAdd = existingRecord.id;
@@ -441,43 +510,51 @@ const ExtractConstructor = ({update}) => {
                         const response2 = await createExtractRecord(data);
                         recordIdToAdd = response2.id;
                     }
-        
+    
                     // Обновляем количество для соответствующей позиции
                     const recordExtractRecord = await fetchOneRecord(data.recordId);
                     const positionExtractRecord = await fetchOnePosition(recordExtractRecord.positionId);
-                    const newQuantity = positionExtractRecord.quantity - (data.quantity * recordExtractRecord.quantity_um);
+                    const newQuantity = positionExtractRecord.quantity - (data.quantity * data.quantity_um);
                     await editPosition(positionExtractRecord.id, { quantity: newQuantity });
-        
+    
                     savedER.push(recordIdToAdd); // Добавляем id сохраненной записи в массив
-                }));
-
+                }
+    
                 // Получаем все записи выписки и обрабатываем те, которые были удалены
                 const response3 = await fetchExtractRecords(null, null, extractId);
                 const deleteER = response3.rows.filter(record => !savedER.includes(record.id));
-                await Promise.all(deleteER.map(async (deleteRecord) => {
+                for (const deleteRecord of deleteER) {
                     // Обновляем количество для соответствующей позиции
                     const recordExtractRecord = await fetchOneRecord(deleteRecord.recordId);
                     const positionExtractRecord = await fetchOnePosition(recordExtractRecord.positionId);
-                    const newQuantity = positionExtractRecord.quantity + (deleteRecord.quantity * recordExtractRecord.quantity_um);
+                    const newQuantity = positionExtractRecord.quantity + (deleteRecord.quantity * deleteRecord.quantity_um);
                     await editPosition(positionExtractRecord.id, { quantity: newQuantity });
-
+    
                     // Удаляем запись
                     await deleteExtractRecord(deleteRecord.id);
-                }));
+                }
             } else {
-                await Promise.all(formDataArray.map(async (formData) => {
+                for (const formData of formDataArray) {
+                    let foundUM = ums.find(um => um.name === formData.um);
+                    if (!foundUM) {
+                        foundUM = await createUM({ name: formData.um });
+                        setUMs(prevUMs => [...prevUMs, foundUM]);
+                    }
+                    formData.umId = foundUM.id;
                     const data = {
                         quantity: formData.quantity,
+                        quantity_um: formData.quantity_um,
+                        umId: formData.umId,
                         project: formData.project,
                         extractId: extractId,
-                        recordId: formData.recordId,
+                        recordId: formData.recordId
                     };
-                    await createExtractRecord(data)
-                    const recordExtractRecord = await fetchOneRecord(data.recordId)
+                    await createExtractRecord(data);
+                    const recordExtractRecord = await fetchOneRecord(data.recordId);
                     const positionExtractRecord = await fetchOnePosition(recordExtractRecord.positionId);
-                    const newQuantity = positionExtractRecord.quantity - (data.quantity*recordExtractRecord.quantity_um)
-                    await editPosition(positionExtractRecord.id, {quantity: newQuantity});
-                }));
+                    const newQuantity = positionExtractRecord.quantity - (data.quantity * data.quantity_um);
+                    await editPosition(positionExtractRecord.id, { quantity: newQuantity });
+                }
             }
         } catch(error){
             console.error('Ошибка при ' + (update ? 'изменении' : 'создании') + ' записей выписки:', error);
@@ -487,7 +564,7 @@ const ExtractConstructor = ({update}) => {
                 description: t("notification.errorDesc10") + (update ? t("extractConstructor.mod__") : t("extractConstructor.edit__")) + t("extractConstructor.extract"),
             });
         }
-    }
+    }    
 
     return ( 
         <>
@@ -576,8 +653,7 @@ const ExtractConstructor = ({update}) => {
                                     </div>
                                     <div className="input-field">
                                         <label>
-                                            {formData.recordId ? t("extractConstructor.quantity") : t("extractConstructor.quantity")}{" "}
-                                            <span style={{ fontWeight: 'bold' }}>{formData.um}</span>:
+                                            {formData.recordId ? t("extractConstructor.quantity") : t("extractConstructor.quantity")}{": "}
                                         </label>
                                         <InputNumber
                                             type='number'
@@ -585,6 +661,47 @@ const ExtractConstructor = ({update}) => {
                                             onChange={value => handleInputChange(index, value, 'quantity')}
                                             placeholder={t("extractConstructor.quantity")}
                                         />
+                                    </div>
+                                    <div className="input-field">
+                                        <label>{t("recordConstructor.um")}:</label>
+                                        <div className='um-ratio-container'>
+                                            <AutoComplete
+                                                options={ums.map(um => ({
+                                                    value: um.name,
+                                                    label: um.name
+                                                }))}
+                                                placeholder={t("positionConstructor.choose") + " " + t("table-info.um,name")}
+                                                value={formData.um}
+                                                onChange={value => {
+                                                    // Обновление formData.um
+                                                    handleInputChange(index, value, 'um');
+                                                    
+                                                    // Если formData.um изменено, вызвать handleInputChange для обновления quantity_um
+                                                    if (formData.um === formData.umR || formData.um === formData.umP) {
+                                                        const valueToUpdate = formData.um === formData.umR ? formData.quantity_umR : 1;
+                                                        handleInputChange(index, valueToUpdate, 'quantity_um');
+                                                    }
+                                                }}
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            />
+                                            <label>
+                                                {formData.recordId ? t("extractConstructor.quantity_um") : t("extractConstructor.quantity_um")}{": "}
+                                                {formData.um !== formData.umP && (
+                                                    <span style={{ fontWeight: "bold" }}>{formData.umP}</span>
+                                                )}
+                                            </label>
+                                            <InputNumber
+                                                type='number'
+                                                value={formData.quantity_um}
+                                                onChange={value => handleInputChange(index, value, 'quantity_um')}
+                                                placeholder={t("extractConstructor.quantity_um")}
+                                                disabled={
+                                                    formData.um === formData.umR || formData.um === formData.umP
+                                                }
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="record-body-block">
@@ -594,19 +711,25 @@ const ExtractConstructor = ({update}) => {
                                         {formData.recordId ? (
                                             <>
                                                 <p>
-                                                    <b>{t("extractConstructor.quantity")}:</b> {formData.quantity_r}{" "}{formData.um}{" "}
-                                                    <b>{t("extractConstructor.left")}:</b> {formData.quantity_left}{" "}{formData.um}
+                                                    <b>{t("extractConstructor.quantity")}:</b> {formData.quantity_r}{" "}{formData.umR}{" "}
+                                                    <b>{t("extractConstructor.left")}:</b> {formData.quantity_left}{" "}{formData.umR}
                                                 </p>
-                                                <p><b>{t("table-columns.provider")}:</b> {formData.provider}</p>
-                                                <p><b>{t("recordConstructor.date")}:</b> {new Date(formData.date).toLocaleString(
-                                                    'en-GB', { 
-                                                        day: '2-digit', 
-                                                        month: '2-digit', 
-                                                        year: 'numeric', 
-                                                        hour: '2-digit', 
-                                                        minute: '2-digit' 
-                                                    }
-                                                )}</p>
+                                                <p>
+                                                    <b>{t("extractConstructor.umP")}:</b> {formData.umP}{" "}
+                                                    <b>{t("extractConstructor.quantity_umR")}:</b> {formData.quantity_umR}{" "}{t("extractConstructor.inone")}
+                                                </p>
+                                                <p>
+                                                    <b>{t("table-columns.provider")}:</b> {formData.provider}{" "}
+                                                    <b>{t("recordConstructor.date")}:</b> {new Date(formData.date).toLocaleString(
+                                                        'en-GB', { 
+                                                            day: '2-digit', 
+                                                            month: '2-digit', 
+                                                            year: 'numeric', 
+                                                            hour: '2-digit', 
+                                                            minute: '2-digit' 
+                                                        }
+                                                    )}
+                                                </p>
                                             </>
                                         ) : (
                                             <p>{t("extractConstructor.chooseRec")}</p>

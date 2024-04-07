@@ -59,7 +59,6 @@ export const fetchOneExtractRecord = async (id) => {
 export const deleteExtractRecord = async (id) => {
     try {
         const response = await $authHost.delete(`api/extractRecord/${id}`);
-        console.log('Response data:', response.data);
         return response.data;
     } catch (error) {
         console.error("Error deleting extractRecord:", error);

@@ -13,6 +13,10 @@ export const ROUTES = {
     EXTRACT:'/extract/:id', //смотреть/менять конкретную выписку
     CREATE_EXTRACT: '/extract/new', //конструктор создания выписки
     UPDATE_EXTRACT: '/extract/:id/update', //конструктор создания записи
+    ORDERS: '/order',  //таблица заказов(у каждого юзера своя)
+    ORDER:'/order/:id', //смотреть/менять конкретный заказ
+    CREATE_ORDER: '/order/new', //конструктор создания заказа
+    UPDATE_ORDER: '/order/:id/update', //конструктор создания заказа
     USER_MANAGEMENT: '/users', //админка (создать/поменять пользователей)
 };
 
@@ -21,5 +25,7 @@ export const TABLES = {
     RECORD: 'RECORDS',
     EXTRACT: 'EXTRACTS',
     EXTRACTRECORD: 'EXTRACTRECORDS',
+    ORDER: 'ORDERS',
+    ORDERRECORD: 'ORDERRECORDS',
     POSITIONADD: 'POSITIONADD',
 }

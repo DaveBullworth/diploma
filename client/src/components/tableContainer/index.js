@@ -9,15 +9,17 @@ import { fetchCategorys } from '../../http/categorysAPI';
 import { fetchUsers } from '../../http/userAPI';
 import { fetchExtracts, deleteExtract } from '../../http/extractsAPI';
 import { fetchExtractRecords, deleteExtractRecord } from '../../http/extractRecordsAPI';
+import { fetchOrders, deleteOrder } from '../../http/ordersAPI';
+import { fetchOrderRecords, deleteOrderRecord } from '../../http/orderRecordsAPI';
 import { Table, Modal, notification, Button } from '../common/index';
 import { columns } from './config';
 import { ROUTES, TABLES } from '../../constants';
 import './style.scss'
 
-const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId}) => {
+const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId, ordersId}) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { t } = useTranslation()
+    const { t } = useTranslation();
     const searchInputRef = useRef(null);
 
     const isPositionPage = location.pathname === '/position';
@@ -40,7 +42,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
     useEffect(() => {
         setLoading(true);
         fetchData();
-    }, [pagination.current, dataOut, sort, date, id, extractsId, filtersER]); // Обновляем данные при изменении текущей страницы
+    }, [pagination.current, dataOut, sort, date, id, extractsId, ordersId, filtersER]); // Обновляем данные при изменении текущей страницы
 
     useEffect(() => {
         const fetchCategoriesData = async () => {
@@ -102,6 +104,7 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             let sortObject = {};
             let dateObject = {};
             let extractsId_ = extractsId;
+            let ordersId_ = ordersId;
             // Формируем объект фильтров на основе состояния filters
             for (let key in filters) {
                 if (key.includes('-')) {
@@ -119,6 +122,9 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             if (keyWord === TABLES.EXTRACT ) {
                 if(id) filterObject.usersId = [id]
                 if(filters.id) extractsId_ = {id: [parseInt(filters.id, 10)]};
+            }
+            if (keyWord === TABLES.ORDER ) {
+                if(filters.id) ordersId_ = {id: [parseInt(filters.id, 10)]};
             }
             if(filtersER) filterObjectExtractRecord = {... filtersER}; // Создаем пустой объект для фильтров
             for (let key in sort) {
@@ -197,6 +203,30 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     newData = response.rows;
                     total = response.count;
                     break;
+                case TABLES.ORDER:
+                    response = await fetchOrders(
+                        pagination.current,
+                        pagination.pageSize,
+                        dateObject,
+                        ordersId_
+                    );
+                    newData = response.rows.map(row => ({
+                        ...row,
+                        records: row.orderRecords.length,
+                    }));
+                    total = response.count;
+                    break;
+                case TABLES.ORDERRECORD:
+                    response = await fetchOrderRecords(
+                        pagination.current,
+                        pagination.pageSize,
+                        id,
+                        filterObjectExtractRecord,
+                        sortObject
+                    );
+                    newData = response.rows;
+                    total = response.count;
+                    break;
                 default:
                     break; 
             }
@@ -224,6 +254,11 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             sorter?.field === 'quantity_min' &&
             sorter?.columnKey === 'shortage'
         ) flag = true
+        if (
+            (prevSorter?.field === 'quantity' && prevSorter?.columnKey === 'quantity') &&
+            sorter?.field === 'active' &&
+            sorter?.columnKey === 'active'
+        ) flag = true
         // Обработка сортировки
         if (sorter && Array.isArray(sorter)) {
             // Если sorter является массивом, значит, сортировка происходит по нескольким столбцам
@@ -236,6 +271,9 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                             break;
                         case 'quantity_min':
                             newSort.quantity_min = s.order; // Добавляем/обновляем сортировку для столбца "Shortage"
+                            break;
+                        case 'active':
+                            newSort.active = s.order; // Добавляем/обновляем сортировку для столбца "Shortage"
                             break;
                         default:
                             break; // Ничего не делаем для остальных столбцов
@@ -259,6 +297,9 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     break;
                 case 'quantity_min':
                     newSort.quantity_min = sorter.order; // Добавляем/обновляем сортировку для столбца "Shortage"
+                    break;
+                case 'active':
+                    newSort.active = sorter.order; // Добавляем/обновляем сортировку для столбца "Shortage"
                     break;
                 default:
                     break; // Ничего не делаем для остальных столбцов
@@ -285,6 +326,9 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
             case TABLES.EXTRACT:
                 navigate(ROUTES.EXTRACT.replace(':id', id));
                 break; 
+            case TABLES.ORDER:
+                navigate(ROUTES.ORDER.replace(':id', id));
+                break; 
             default:
                 break; 
         }
@@ -300,6 +344,9 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                 break;
             case TABLES.EXTRACT:
                 navigate(ROUTES.UPDATE_EXTRACT.replace(':id', id));
+                break;
+            case TABLES.ORDER:
+                navigate(ROUTES.UPDATE_ORDER.replace(':id', id));
                 break;
             default:
                 break; 
@@ -344,7 +391,14 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                     }
                     await deleteExtract(id);
                     toDescription = t("notification.extract")
-                    break
+                    break;
+                case TABLES.ORDER:
+                    const response = await fetchOrderRecords(null, null, id)
+                    for (const orderRecord of response.rows) {
+                        await deleteOrderRecord(orderRecord.id);
+                    }
+                    await deleteOrder(id);
+                    break; 
                 default:
                     break; 
             }
@@ -456,6 +510,27 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
         setFiltersER(newFilters);
     }    
 
+    const filterOrderRecords = async () => {
+        let newFilters = {}
+        if(filters && filters.position_desc && filters.position_desc !== ''){
+            const response = await fetchPositions(null, null, {desc: filters.position_desc}) 
+            const positionsId = [];
+            if (response.rows && response.rows.length > 0) {
+                // Переменная для хранения всех id из response.row
+                // Перебираем response.row и добавляем каждый id в positionsId
+                response.rows.forEach(row => {
+                    positionsId.push(row.id);
+                });
+            }
+            // Устанавливаем positionsId в newFilters
+            newFilters.positionsId = positionsId;
+            // Вызываем setFiltersER с новыми фильтрами
+        } else {
+            return setFiltersER({});
+        }
+        setFiltersER(newFilters);
+    }
+
     const filterCategoriesOrUsers = (filterKey) => ({
         filterDropdown: ({ setSelectedKeys, confirm }) => (
             <div className="filter-container">
@@ -546,6 +621,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         confirm();
                         if (dataIndex.includes('+')) {
                             filterExtractRecords();
+                        } else if(keyWord === TABLES.ORDERRECORD) {
+                            filterOrderRecords();
                         } else {
                             fetchData();
                         }
@@ -558,6 +635,8 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId})
                         confirm();
                         if (dataIndex.includes('+')) {
                             filterExtractRecords();
+                        } else if(keyWord === TABLES.ORDERRECORD) {
+                            filterOrderRecords();
                         } else {
                             fetchData();
                         }

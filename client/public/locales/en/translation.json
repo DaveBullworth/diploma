@@ -10,7 +10,9 @@
         "usersPanel": "USERS PANEL",
         "extracts": "EXTRACTS",
         "addExtract": "ADD EXTRACT",
-        "units" : "UNIT SYSTEM"
+        "units" : "UNIT SYSTEM",
+        "order" : "ORDERS",
+        "addOrder" : "ADD ORDER"
     },
     "table-info": {
         "filters": "Filters",
@@ -30,7 +32,8 @@
         "record,desc_fact+" : "description(record)",
         "record,um+" : "u.m.(record)",
         "project+" : "project",
-        "id" : "search by id"
+        "id" : "search by id",
+        "position_desc" : "position description"
     },
     "extractRecordFilters": {
         "project" : "project",
@@ -55,6 +58,8 @@
         "desc_pos" : "Description(Position)",
         "desc_fact" : "Description(Record)",
         "project" : "Project",
+        "active" : "Active",
+        "recordsNO" : "N-O Records",
         "tooltip" : {
             "show" : "Show",
             "edit" : "Edit",
@@ -62,6 +67,8 @@
             "newRecord" : "Add New Record"
         },
         "low" : "LOW",
+        "activeTagTrue" : "ACTIVE",
+        "activeTagFalse" : "DONE",
         "by" : "",
         "in" : "in",
         "apart" : "apart",
@@ -112,13 +119,15 @@
         "successDesc2" : " position deleted successfully!",
         "successDesc3" : " deleted successfully!",
         "successDesc4" : "New records added successfully!",
+        "successDesc5" : " deleted successfully!",
         "editSucc" : "edited successfully!",
         "position" : "Position",
         "position_" : "position",
         "record" : "record",
         "extract" : "extract",
         "reg" : "register",
-        "edit" : "edit"
+        "edit" : "edit",
+        "order" : "order"
     },
     "modal" : {
         "confirm" : "Confirmation",
@@ -267,5 +276,26 @@
         "extractRecords" : "extract records",
         "no_rec" : "N-O records",
         "no_ER" : "N-O extract records"
+    },
+    "orderPage" : {
+        "title" : "Order Catalog",
+        "title2" : "Search extracts for selected positions",
+        "title3" : "Order Records",
+        "title4" : "Create a new order",
+        "order" : "order",
+        "_order" : "Order",
+        "order__" : "",
+        "choosePos" : "Position for order record search",
+        "selPos" : "Selected Position",
+        "editOrder" : "Edit Order",
+        "orderStatus" : "Order completed",
+        "date" : "DATE OF ORDER",
+        "addRec" : "Add record",
+        "OR" : "Order record",
+        "remRec" : "Remove record",
+        "orderStat" : "Order Status",
+        "create_" : "created",
+        "order_" : "order",
+        "errTitle" : "Empty order fields were found"
     }
 } 

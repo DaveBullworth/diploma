@@ -7,6 +7,9 @@ import PositionConstructor from './pages/positionConstructorPage'
 import Extracts from './pages/extractsPage'
 import Extract from './pages/extractPage';
 import ExtractConstructor from './pages/extractConstructorPage';
+import Orders from './pages/ordersPage'
+import Order from './pages/orderPage';
+import OrderConstructor from './pages/orderConstructorPage';
 import UserManagement from './pages/userManagementPage'
 import RecordConstructor from './pages/recordConstructor'
 import Categories from './pages/categoriesPage';
@@ -64,6 +67,22 @@ export const routes = [
         {
           path: ROUTES.UPDATE_RECORD,
           element: <RecordConstructor key={ROUTES.UPDATE_RECORD} update={true}/>,
+        },
+        {
+          path: ROUTES.ORDERS,
+          element: <Orders />,
+        },
+        {
+          path: ROUTES.ORDER,
+          element: <Order />,
+        },
+        {
+          path: ROUTES.CREATE_ORDER,
+          element: <OrderConstructor key={ROUTES.CREATE_ORDER}/>,
+        },
+        {
+          path: ROUTES.UPDATE_ORDER,
+          element: <OrderConstructor key={ROUTES.UPDATE_ORDER} update={true}/>,
         },
         {
           path: ROUTES.USER_MANAGEMENT,

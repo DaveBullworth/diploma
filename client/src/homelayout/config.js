@@ -7,7 +7,9 @@ import {
     ContactsOutlined,
     PlusOutlined,
     SnippetsOutlined,
-    AuditOutlined
+    AuditOutlined,
+    ContainerOutlined,
+    FileAddOutlined
  } from '@ant-design/icons';
 import { ROUTES } from '../constants';
 import i18n from "../i18n";
@@ -23,6 +25,16 @@ const getMenuItems = () => {
             key: ROUTES.CREATE_POSITION,
             icon: <PlusSquareOutlined />,
             label: <NavLink to={ROUTES.CREATE_POSITION}>{i18n.t('menu.addPosition')}</NavLink>,
+        },
+        {
+            key: ROUTES.ORDERS,
+            icon: <ContainerOutlined />,
+            label: <NavLink to={ROUTES.ORDERS}>{i18n.t('menu.order')}</NavLink>,
+        },
+        {
+            key: ROUTES.CREATE_ORDER,
+            icon: <FileAddOutlined />,
+            label: <NavLink to={ROUTES.CREATE_ORDER}>{i18n.t('menu.addOrder')}</NavLink>,
         },
         {
             key: ROUTES.CATEGORIES,

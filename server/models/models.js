@@ -65,6 +65,21 @@ const UM = sequelize.define('um', {
     name: { type: DataTypes.STRING, allowNull: false }
 });
 
+// Модель заказа
+const Order = sequelize.define('order', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+    active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true } 
+});
+
+// Модель записи заказа
+const OrderRecord = sequelize.define('orderRecord', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    quantity: { type: DataTypes.INTEGER, allowNull: false },
+    active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true }
+});
+
+
 // Определение ассоциации между позициями через PositionHierarchy
 Position.belongsToMany(Position, { through: PositionHierarchy, as: 'ParentPositions', foreignKey: 'childId' });
 Position.belongsToMany(Position, { through: PositionHierarchy, as: 'ChildPositions', foreignKey: 'parentId' });
@@ -91,6 +106,14 @@ Record.belongsTo(UM)
 UM.hasMany(ExtractRecord, { as: 'extractRecords' });
 ExtractRecord.belongsTo(UM)
 
+// Связь "один ко многим" от заказа к записям заказа
+Order.hasMany(OrderRecord, { as: 'orderRecords' });
+OrderRecord.belongsTo(Order);
+
+// Связь "один ко многим" от позиции к записям заказа
+Position.hasMany(OrderRecord, { as: 'orderRecords' });
+OrderRecord.belongsTo(Position);
+
 module.exports = {
-    User, Extract, ExtractRecord, Category, Position, PositionHierarchy, Record, UM
+    User, Extract, ExtractRecord, Category, Position, PositionHierarchy, Record, UM,  Order, OrderRecord
 }

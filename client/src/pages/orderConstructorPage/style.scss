@@ -1,0 +1,89 @@
+.order-card {
+    margin-bottom: 20px;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+  
+    .search-container-orders {
+        display: flex;
+        flex-direction: row;
+        .ant-input-group-wrapper{
+            width: 80%;
+            margin-left: 1rem;
+        }
+    }
+
+    .selPos-label{
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .order-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+
+        .ant-checkbox-wrapper {
+            margin-right: 10px;
+        }
+  
+        .ant-typography {
+            margin: 0;
+        }
+    
+        .ant-btn {
+            margin-left: 10px;
+        }
+    }
+  
+    .order-card-body {
+        margin-bottom: 10px;
+        display: flex;
+
+        .input-field {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            width: 35%;
+            justify-content: center;
+            label {
+                text-align: center;
+                width: auto;
+                margin-right: 1rem;
+                margin-left: 1rem;
+            }
+            .ant-input-number{
+                width: auto;
+            }
+        }
+
+        .input-field:nth-child(1) {
+            justify-content: flex-start;
+        }
+
+        .input-field:nth-child(3) {
+            justify-content: end;
+        }
+    
+        .table-container {
+            margin-bottom: 10px;
+        }
+    
+        .ant-input-number {
+            width: 100%;
+        }
+    }
+}
+  
+.order-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 25%;
+
+    .ant-btn {
+        width: 30%;
+    }
+}
+  

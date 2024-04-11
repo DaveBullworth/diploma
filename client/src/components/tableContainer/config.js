@@ -280,6 +280,110 @@ export const columns = (
         }
     ]
 
+    const columnsOrders = [
+        {
+            title: '#',
+            dataIndex: 'number',
+            key: 'number',
+        },
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            ...getColumnSearchProps('id'),
+        },
+        {
+            title: i18n.t("table-columns.recordsNO"),
+            dataIndex: 'records',
+            key: 'records',
+        },
+        {
+            title: i18n.t("table-columns.active"),
+            dataIndex: 'active',
+            key: 'active',
+            sorter: true,
+            render: (active) => (
+                <Tag color={active ? 'green' : 'blue'}>
+                   {active ? i18n.t("table-columns.activeTagTrue") : i18n.t("table-columns.activeTagFalse")} 
+                </Tag>
+            )
+        },
+        {
+            title: i18n.t("table-columns.date"),
+            dataIndex: 'date',
+            key: 'date',
+            render: date => {
+                const formattedDate = new Date(date).toLocaleString(
+                    'en-GB', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                        //, timeZone: 'UTC'
+                    }
+                );
+                return formattedDate;
+            },
+            ...getDateSearchProps(),
+        },
+        {
+            title: i18n.t("table-columns.action"),
+            key: 'action',
+            render: (text, record) => (
+                <Space size="middle">
+                    <Tooltip title={i18n.t("table-columns.tooltip.show")}>
+                        <PlayCircleOutlined style={{ color: 'green', fontSize: '18px' }} onClick={() => handleShow(record.id)} />
+                    </Tooltip>
+                    <Tooltip title={i18n.t("table-columns.tooltip.edit")}>
+                        <EditOutlined style={{ color: 'blue', fontSize: '18px' }} onClick={() => handleEdit(record.id)} />
+                    </Tooltip>
+                    <Tooltip title={i18n.t("table-columns.tooltip.delete")}>
+                        <DeleteOutlined style={{ color: 'red', fontSize: '18px' }} onClick={() => showConfirm(record.id, '#' + record.id)} />
+                    </Tooltip>
+                </Space>
+            ),
+        }
+    ]
+
+    const columnsOrderRecords = [
+        {
+            title: '#',
+            dataIndex: 'number',
+            key: 'number',
+        },
+        {
+            title: i18n.t("table-columns.desc_pos"),
+            dataIndex: [ 'position', 'desc'],
+            key: 'desc',
+            ...getColumnSearchProps('position_desc'),
+        },
+        {
+            title: i18n.t("table-columns.quantity"),
+            dataIndex: 'quantity',
+            key: 'quantity',
+            sorter: { multiple: 1 },
+            sortOrder: sort.quantity, // Устанавливаем порядок сортировки
+        },
+        {
+            title: i18n.t("table-columns.um"),
+            dataIndex: [ 'position', 'um', 'name'],
+            key: 'um',
+        },
+        {
+            title: i18n.t("table-columns.active"),
+            dataIndex: 'active',
+            key: 'active',
+            sorter: { multiple: 2 },
+            sortOrder: sort.active, // Устанавливаем порядок сортировки
+            render: (active) => (
+                <Tag color={active ? 'green' : 'blue'}>
+                   {active ? i18n.t("table-columns.activeTagTrue") : i18n.t("table-columns.activeTagFalse")} 
+                </Tag>
+            )
+        },
+    ]
+
     return (keyWord) => {
         switch (keyWord) {
             case TABLES.POSITION:
@@ -371,6 +475,10 @@ export const columns = (
                     }
                     return column;
                 });
+            case TABLES.ORDER:
+                return columnsOrders
+            case TABLES.ORDERRECORD:
+                return columnsOrderRecords
             default:
                 console.error('Unknown keyWord:', keyWord);
                 return [];

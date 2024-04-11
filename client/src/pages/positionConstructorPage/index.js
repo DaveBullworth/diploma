@@ -37,6 +37,7 @@ const PositionConstructor = ({update}) => {
     const [modalVisible, setModalVisible] = useState(false); // State to manage modal visibility
     const [modalContent, setModalContent] = useState(null); // State to manage modal content
     const [searchFilters, setSearchFilters] = useState({});
+    const [initialName, setInitialName] = useState('')
 
     const handleEdit = () => {
         navigate(ROUTES.POSITION.replace(':id', id));
@@ -150,6 +151,7 @@ const PositionConstructor = ({update}) => {
                         quantity_min: response.quantity_min
                     });
                     setSelectedPositions(response.ChildPositions)
+                    setInitialName(response.name)
                 }
             } catch (error) {
                 notification({
@@ -289,7 +291,7 @@ const PositionConstructor = ({update}) => {
                 description: t("notification.errorDesc3"),
             });
         }
-    };    
+    };  
 
     return (
         <div className="position-constructor-container">
@@ -308,7 +310,7 @@ const PositionConstructor = ({update}) => {
                         />
                     </>
                 )}
-                <Title>{update ? t("positionConstructor.titleUpdate") : t("positionConstructor.titleNew") }<u style={{ color: '#1890ff' }}>{inputValues.name}</u></Title>
+                <Title>{update ? t("positionConstructor.titleUpdate") : t("positionConstructor.titleNew") }<u style={{ color: '#1890ff' }}>{initialName}</u></Title>
             </div>
             <div className="form-row">
                 <div className="form-group">

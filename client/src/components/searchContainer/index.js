@@ -3,24 +3,43 @@ import { Input, Cascader } from 'antd';
 import { useTranslation } from 'react-i18next';
 const { Search } = Input;
 
-const SearchContainer = ({ options, onSearch }) => {
+const SearchContainer = ({ options, onSearch, indexR }) => {
     const { t } = useTranslation()
     const [searchValue, setSearchValue] = useState('');
     const [selectedOption, setSelectedOption] = useState([]);
 
     const handleSearch = () => {
+        //console.log(!!indexR)
         // Проверяем наличие значения value и option
         if (selectedOption?.length > 0 && searchValue.trim()) {
             // Выполняем поиск только если оба условия выполняются
-            onSearch({
-                value: searchValue.trim(),
-                option: selectedOption[0]
-            });
+            if (indexR || indexR===0) {
+                onSearch({
+                    value: searchValue.trim(),
+                    option: selectedOption[0],
+                    indexR
+                });
+            } else {
+                onSearch({
+                    value: searchValue.trim(),
+                    option: selectedOption[0],
+                    indexR: null
+                });
+            }
         } else if(!selectedOption?.length && !searchValue.trim()) {
-            onSearch({
-                value: null,
-                option: null
-            });
+            if (indexR || indexR===0) {
+                onSearch({
+                    value: null,
+                    option: null,
+                    indexR
+                });
+            } else {
+                onSearch({
+                    value: null,
+                    option: null,
+                    indexR: null
+                });
+            }
         } else {return}
     };    
 

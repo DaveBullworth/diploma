@@ -589,7 +589,10 @@ const ExtractConstructor = ({update}) => {
                             />
                         </span>
                         :
-                        t("extractConstructor.title3" + ":")}
+                            <span>
+                                {t("extractConstructor.title3") + ":"}
+                            </span>
+                        }
                     >
                         <Meta
                             avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}

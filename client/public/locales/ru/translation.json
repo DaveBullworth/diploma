@@ -268,7 +268,9 @@
         "quantity_um" : "Коэфф.",
         "umP" : "Ед. Изм. Позиции",
         "quantity_umR" : "Коэфф-нт",
-        "inone" : "в 1"
+        "inone" : "в 1",
+        "genExcel" : "Создать Отчёт",
+        "genExcelLoading" : "Отчёт Создаётся"
     },
     "unitPage" : {
         "title" : "Меню Единиц Измерения",

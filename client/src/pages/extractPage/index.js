@@ -10,6 +10,7 @@ import { deleteExtract, fetchOneExtract } from '../../http/extractsAPI';
 import { fetchExtractRecords, deleteExtractRecord } from '../../http/extractRecordsAPI';
 import { ROUTES, TABLES } from '../../constants';
 import TableContainer from '../../components/tableContainer';
+import ExcelGenerator from '../../components/generateExcel';
 import './style.scss'
 
 const Extract = () => {
@@ -127,6 +128,9 @@ const Extract = () => {
                     <TableContainer keyWord={TABLES.EXTRACTRECORD} id={id} />
                 </>
             )}
+            <div className='genExcel-btn'>
+                <ExcelGenerator id={id}/>
+            </div>
         </div>
     );
 }

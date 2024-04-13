@@ -29,7 +29,7 @@ class ExtractController {
                     as: 'extractRecords'
                 }, {
                     model: User,
-                    attributes: ['login'],
+                    attributes: ['login', 'name'],
                     required: true 
                 }]
             });

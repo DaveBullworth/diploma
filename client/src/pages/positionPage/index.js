@@ -6,6 +6,7 @@ import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, FormOutlined } from '@
 import { Spin, Modal, notification } from '../../components/common/index'
 import { fetchOnePosition, deletePosition } from '../../http/positionsAPI'
 import TableContainer from '../../components/tableContainer';
+import ChartPosition from '../../components/chartPosition'
 import { ROUTES, TABLES } from '../../constants';
 import './style.scss'
 
@@ -108,6 +109,9 @@ const Position = () => {
                     <TableContainer keyWord={TABLES.POSITION} dataOut={ChildPositions} />
                 </>
             )}
+            <div className='chart-container'>
+                <ChartPosition id={id}/>
+            </div>
         </div>
     );
 }

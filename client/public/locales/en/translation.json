@@ -171,7 +171,11 @@
         "info_" : "",
         "_info" : "info",
         "pos_rec" : "Position Records",
-        "rel_pos" : "Related Positions"
+        "rel_pos" : "Related Positions",
+        "chart" : "Position q-ty tracking",
+        "receipts" : "Receipts",
+        "expenses" : "Expenses",
+        "diff" : " Difference: "
     },
     "recordConstructor" : {
         "titleNew": "Adding records for a position",

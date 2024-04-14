@@ -33,4 +33,9 @@
         text-align: center; /* Выравнивание текста по центру */
         font-size: 24px;
     }
+    .chart-container {
+        display: flex;
+        justify-content: center;
+        padding: 1.5rem;
+    }
 }

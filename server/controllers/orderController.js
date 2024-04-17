@@ -110,7 +110,7 @@ class OrderController {
             if (date) {
                 order.date = date;
             }
-            if (active) {
+            if (active || active===false) {
                 order.active = active;
             }
             await order.save();

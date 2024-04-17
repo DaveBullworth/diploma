@@ -162,7 +162,7 @@
         "decline" : "Cancel",
         "delNot1" : "There are extracts with its use (extract records) for this record:",
         "delNot2" : "before deleting an 'record', you need to change these 'extracts'!",
-        "delNot3" : "There are 'records' with its use for this 'position':",
+        "delNot3" : "There are 'records' or/and 'orders' with its use for this 'position':",
         "delNot4" : "before deleting an 'position', you need to change/delete these 'records'!"
     },
     "positionPage" : {
@@ -193,7 +193,8 @@
         "copy" : "copy previous",
         "addRec" : "Another record",
         "backToPos" : "Return to position",
-        "remRec" : "Remove record"
+        "remRec" : "Remove record",
+        "errTitle" : "Empty record fields were found"
     },
     "categoryPage" : {
         "title" : "Category Menu",

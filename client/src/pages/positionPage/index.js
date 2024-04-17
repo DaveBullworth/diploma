@@ -5,6 +5,8 @@ import { Descriptions, Divider } from 'antd';
 import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, FormOutlined } from '@ant-design/icons';
 import { Spin, Modal, notification } from '../../components/common/index'
 import { fetchOnePosition, deletePosition } from '../../http/positionsAPI'
+import { fetchRecords } from '../../http/recordsAPI'
+import { fetchOrderRecords } from '../../http/orderRecordsAPI'
 import TableContainer from '../../components/tableContainer';
 import ChartPosition from '../../components/chartPosition'
 import { ROUTES, TABLES } from '../../constants';
@@ -34,15 +36,30 @@ const Position = () => {
     const handleEdit = () => {
         navigate(ROUTES.UPDATE_POSITION.replace(':id', id));
     }
-    const showConfirm = () => {
-        const content = `${t("modal.sureDel")} ${t("positionPage.position_")} ${name} ?`;
+    const showConfirm = async() => {
+        let content = `${t("modal.sureDel")} ${t("positionPage.position_")} ${name} ?`;
+        let flag = false;
+        let okButtonProps = {};
+        const response1 = await fetchRecords(null, null, id);
+        const response2 = await fetchOrderRecords(null, null, null, { positionsId: [id] });
+        if (response1.rows.length > 0 || response2.rows.length > 0) {
+            flag = true;
+            const recordsInfo = response1.rows.map(row => `#${row.id} (${row.desc_fact})`).join(', ') + " " + response2.rows.map(row => `#${row.id} (${t("orderPage.order")})`).join(', ')
+            content = (
+                <span>
+                    {t("modal.delNot3")} <strong>{recordsInfo}</strong> {t("modal.delNot4")}
+                </span>
+            );
+            okButtonProps = { style: { display: 'none' } };
+        }
         Modal({
           type: 'confirm',
           title: t("modal.confirm"),
           content,
           onOk() {
-            handleDelete(id)
+            if (!flag) handleDelete(id);
           },
+          okButtonProps,
         });
     };
     const handleDelete = async (id) => {

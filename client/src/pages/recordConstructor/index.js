@@ -71,6 +71,13 @@ const RecordConstructor = ({update}) => {
     const handleSubmit = async () => {
         try {
             setLoading(true)
+            // Проверка на наличие пустых полей в formDataArray
+            const hasEmptyFields = formDataArray.some(formData => {
+                return Object.values(formData).some(value => value === '' || value === null || value === undefined);
+            });
+            if (hasEmptyFields) {
+                throw new Error(t("recordConstructor.errTitle"));
+            }
             let totalQuantity = 0; // Сумма произведений quantity * quantity_um
             let newQuantity = positionData.quantity;
             if (update) {
@@ -122,7 +129,7 @@ const RecordConstructor = ({update}) => {
             notification({
                 type: 'error',
                 message: t("notification.error"),
-                description: t("notification.errorDesc6"),
+                description: error.message || t("notification.errorDesc6"),
             });
         } finally {
             setLoading(false)

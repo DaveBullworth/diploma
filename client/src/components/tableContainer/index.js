@@ -442,10 +442,11 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId, 
         }
 
         if (keyWord === TABLES.POSITION) {
-            const response = await fetchRecords(null, null, id);
-            if (response.rows.length > 0) {
+            const response1 = await fetchRecords(null, null, id);
+            const response2 = await fetchOrderRecords(null, null, null, { positionsId: [id] });
+            if (response1.rows.length > 0 || response2.rows.length > 0) {
                 flag = true;
-                const recordsInfo = response.rows.map(row => `#${row.id} (${row.desc_fact})`).join(', ');
+                const recordsInfo = response1.rows.map(row => `#${row.id} (${row.desc_fact})`).join(', ') + " " + response2.rows.map(row => `#${row.id} (${t("orderPage.order")})`).join(', ')
                 content = (
                     <span>
                         {t("modal.delNot3")} <strong>{recordsInfo}</strong> {t("modal.delNot4")}
@@ -468,12 +469,19 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId, 
 
     const filterExtractRecords = async () => {
         let newFilters = {}
+        console.log(filters)
+
         if (!filters || Object.values(filters).every(value => value === "")) {
             return setFiltersER({});
-        } else if (filters["project+"] && Object.keys(filters).length === 1) {
+        } else if (filters["project+"] 
+            && (Object.keys(filters).length === 1 
+            || Object.keys(filters).every(key => key === "project+" || filters[key] === ""))
+            ){
             newFilters = { ...filters };
             newFilters.project = newFilters["project+"];
             delete newFilters["project+"];
+            delete newFilters["record,position,desc+"]
+            delete newFilters["record,desc_fact+"]
         } else {
             let recordsIdBuf1 = [];
             if (("record,um+" in filters && filters["record,um+"] !== "") 

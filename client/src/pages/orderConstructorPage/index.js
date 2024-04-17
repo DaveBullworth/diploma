@@ -5,7 +5,7 @@ import { Card, Empty, Typography, Tag, InputNumber, DatePicker, Pagination, List
 import { Button, Spin, notification } from '../../components/common/index';
 import { PlusOutlined, CheckOutlined, CloseOutlined, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import { createOrder, editOrder, fetchOneOrder, deleteOrder } from "../../http/ordersAPI"
-import { createOrderRecord, deleteOrderRecord, fetchOrderRecords } from "../../http/orderRecordsAPI"
+import { createOrderRecord, deleteOrderRecord, editOrderRecord, fetchOrderRecords } from "../../http/orderRecordsAPI"
 import { fetchPositions, fetchOnePosition } from "../../http/positionsAPI"
 import SearchContainer from '../../components/searchContainer';
 import TableContainer from '../../components/tableContainer'
@@ -283,10 +283,18 @@ const OrderConstructor = ({update}) => {
                     let foundMatchingRecord = false;
                     for (const formData of formDataArray) {
                         if (
-                            formData.active &&
+                            formData.active === row.active &&
                             formData.positionId === row.positionId &&
                             formData.quantity === row.quantity
                         ) {
+                            foundMatchingRecord = true;
+                            break;
+                        } else if (
+                            formData.positionId === row.positionId &&
+                            formData.quantity === row.quantity
+                        ) {
+                            const rep = await editOrderRecord(row.id, {active: formData.active})
+                            console.log(rep)
                             foundMatchingRecord = true;
                             break;
                         }
@@ -301,7 +309,6 @@ const OrderConstructor = ({update}) => {
                     let foundMatchingRecord = false;
                     for (const row of response3.rows) {
                         if (
-                            formData.active &&
                             formData.positionId === row.positionId &&
                             formData.quantity === row.quantity
                         ) {

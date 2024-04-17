@@ -144,7 +144,7 @@ const UserManagement = () => {
         const editedUserData = isPasswordEmpty ? { ...editedUser, password: undefined } : editedUser;
         const confirmEdit = Modal.confirm({
             title: t("modal.attention"),
-            content: `${t("modal.confirm_")} ${isRegistration ? t("modal.regNew") : t("modal.edition")} ${t("modal.user")} '${isRegistration ? editedUser.login : selectedUser.login }'`,
+            content: `${t("modal.confirm_")} ${isRegistration ? t("modal.regNew") : t("modal.edit")} ${t("modal.user")} '${isRegistration ? editedUser.login : selectedUser.login }'`,
             onOk: async () => {
                 try {
                     if (isRegistration) {
@@ -156,7 +156,7 @@ const UserManagement = () => {
                     fetchUsersInfo();
                     notification({
                         type: 'success',
-                        message: t("modal.success"),
+                        message: t("notification.success"),
                         description: `${t("modal.user_")} ${isRegistration ? editedUser.login : selectedUser.login } ${isRegistration ? t("modal.reged") : t("modal.edited")} ${t("notification.success_")}!`,
                     });
                 } catch (error) {

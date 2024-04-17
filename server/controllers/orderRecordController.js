@@ -126,7 +126,7 @@ class OrderRecordController {
         if (!id){
             return next(ApiError.badRequest('Не передан ID!(при попытке изменить запись выписки)'))
         }
-        let {quantity, orderId, positionId} = req.body;
+        let {quantity, orderId, positionId, active} = req.body;
         try {
             const orderRecord = await OrderRecord.findByPk(id);
             if (!orderRecord) {
@@ -140,6 +140,9 @@ class OrderRecordController {
             }
             if (positionId) {
                 orderRecord.positionId = positionId;
+            }
+            if (active || active===false) {
+                orderRecord.active = active;
             }
             await orderRecord.save();
             return res.json(orderRecord);

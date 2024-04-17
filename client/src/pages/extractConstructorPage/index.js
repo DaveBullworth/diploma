@@ -399,7 +399,7 @@ const ExtractConstructor = ({update}) => {
             }
     
             // Проверка наличия записей с quantity больше, чем quantity_left
-            if (formDataArray.some(formData => formData.quantity > formData.quantity_left*formData.quantity_umR)) {
+            if (formDataArray.some(formData => formData.quantity*formData.quantity_um > formData.quantity_left*formData.quantity_umR)) {
                 throw new Error(t("extractConstructor.err3") + " " + (update ? t("extractConstructor.mod") : t("extractConstructor.create")) + " " + t("extractConstructor.errTitle2"));
             }
     

@@ -55,9 +55,14 @@ Development of software for optimization of inventory accounting of equipment at
 1. **Run the Docker container:**
     Notice `REACT_APP_API_URL` declaring an environment variable to determine the ip of the server computer:
     ```bash
-    docker run -e REACT_APP_API_URL='http://<server-local-ip>:5000/' -p 80:80 -d client
+    docker run -e API_URL='http://<server-local-ip>:5000/' -p 80:80 -d client
     ```
     Replace `<server-local-ip>` with the local IP address of your server.
+
+**Notice**
+
+1. If you do not specify an environment variable for the `ip server` when launching the container yourself, the default variable from .env will be = `http://localhost:5000/`.
+2. Please note that when using Chrome browsers as a working environment, you may need to extend eliminates the CORS restrictions imposed by your browser.
     
 ### Server
 

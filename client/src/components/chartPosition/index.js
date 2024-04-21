@@ -2,18 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Chart as ChartJS, TimeScale, LinearScale, PointElement, LineElement, Tooltip } from "chart.js";
 import { useTranslation } from 'react-i18next';
 import { Line } from 'react-chartjs-2'; 
-import { Typography } from 'antd';
+import { Typography, DatePicker } from 'antd';
 import { fetchExtractRecords } from '../../http/extractRecordsAPI';
 import { fetchRecords } from '../../http/recordsAPI';
 import { Spin } from "../../components/common/index";
 import 'chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm';
 
 const { Title } = Typography;
+const { RangePicker } = DatePicker;
 
 const ChartPosition = ({ id }) => {
     const { t } = useTranslation();
     const [incomingData, setIncomingData] = useState(null);
     const [outgoingData, setOutgoingData] = useState(null);
+    const [selectedDates, setSelectedDates] = useState([]);
     ChartJS.register(TimeScale, LinearScale, PointElement, LineElement, Tooltip);
 
     useEffect(() => {
@@ -89,53 +91,75 @@ const ChartPosition = ({ id }) => {
 
     const chartData = prepareChartData();
 
+    const handleDateChange = (dates) => {
+        console.log(dates)
+        const toDate = dateString => new Date(dateString);
+        
+        // Если массив dates пустой, устанавливаем selectedDates в null или пустой массив
+        if (!dates) {
+            setSelectedDates([]); // или setSelectedDates(null);
+        } else {
+            const transformedDates = dates.map(toDate); // Преобразование каждого элемента массива dates в дату
+            setSelectedDates(transformedDates);
+        }
+    };    
+
     return (
         <div>
             <Title>{t("positionPage.chart")}</Title>
-            <div style={{ height: '400px', width: '600px' }}>
-            <Line
-                data={{
-                    datasets: chartData.datasets,
-                    labels: chartData.labels
-                }}
-                options={{
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-            
-                                    // Проверяем, что есть предыдущая точка
-                                    if (context.dataIndex > 0) {
-                                        const previousY = context.chart.data.datasets[context.datasetIndex].data[context.dataIndex - 1].y;
-                                        const currentY = context.parsed.y;
-                                        let difference = currentY - previousY;
-                                        if(difference>0) difference = '+' + difference
-                                        label += t("positionPage.diff") + difference;
-                                    } else if (context.datasetIndex === 0) {
-                                        // Если точка первая
-                                        label = t("positionPage.receipts") + t("positionPage.diff") + '+' + context.parsed.y;
+            <div style={{ height: '300px', width: '600px' }}>
+                <Line
+                    data={{
+                        datasets: chartData.datasets,
+                        labels: chartData.labels
+                    }}
+                    options={{
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                
+                                        // Проверяем, что есть предыдущая точка
+                                        if (context.dataIndex > 0) {
+                                            const previousY = context.chart.data.datasets[context.datasetIndex].data[context.dataIndex - 1].y;
+                                            const currentY = context.parsed.y;
+                                            let difference = currentY - previousY;
+                                            if(difference>0) difference = '+' + difference
+                                            label += t("positionPage.diff") + difference;
+                                        } else if (context.datasetIndex === 0) {
+                                            // Если точка первая
+                                            label = t("positionPage.receipts") + t("positionPage.diff") + '+' + context.parsed.y;
+                                        }
+                                        
+                                        return label;
                                     }
-                                    
-                                    return label;
                                 }
                             }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day'
-                            },
-                            distribution: 'linear'
                         },
-                        y: {
-                            beginAtZero: true,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day'
+                                },
+                                distribution: 'linear',
+                                min: selectedDates[0], 
+                                max: selectedDates[1] 
+                            },
+                            y: {
+                                beginAtZero: true,
+                            }
                         }
-                    }
-                }}
-            />
+                    }}
+                />
+            </div>
+            <div style={{display: 'flex', justifyContent:'center', paddingTop: '1rem'}}>
+                <RangePicker
+                    showTime={{ format: 'HH:mm', minuteStep: 15 }}
+                    format="YYYY-MM-DD HH:mm"
+                    onChange={handleDateChange}
+                />
             </div>
         </div>
     );

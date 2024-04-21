@@ -172,7 +172,23 @@ const TableContainer = ({keyWord, id, dataOut, handleRemoveRelated, extractsId, 
                         dateObject,
                         filterObjectRecord
                     );
-                    newData = response.rows;
+                    const updatedRecords = [];
+                    for (const row of response.rows) {
+                        try {
+                            const response2 = await fetchExtractRecords(null, null, null, {recordsId: [row.id]});
+                            let sum = 0;
+                            for (const item of response2.rows) {
+                                sum += item.quantity * item.quantity_um;
+                            }
+                            const leftValue = row.quantity - sum / row.quantity_um;
+                            const updatedRow = {...row, left: parseFloat(leftValue.toFixed(2))}; // Добавляем поле left в объект
+                            updatedRecords.push(updatedRow);
+                        } catch (error) {
+                            console.error('Error fetching extract records:', error);
+                            // Обработка ошибки при запросе extract records
+                        }
+                    }
+                    newData = updatedRecords;
                     total = response.count;
                     break;
                 case TABLES.EXTRACT:

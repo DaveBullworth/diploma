@@ -174,6 +174,11 @@ export const columns = (
             key: 'quantity',
         },
         {
+            title: i18n.t("extractConstructor.left"),
+            dataIndex: 'left',
+            key: 'left',
+        },
+        {
             title: i18n.t("table-columns.um"),
             dataIndex: ['um', 'name'],
             key: 'um',

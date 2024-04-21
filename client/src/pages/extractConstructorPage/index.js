@@ -199,21 +199,38 @@ const ExtractConstructor = ({update}) => {
         [positionPagination]
     );
 
-    // Функция для загрузки списка записей
     const fetchRecordsAndUpdateModal = useCallback(
         async () => {
             try {
                 const response = await fetchRecords(recordPagination.current, recordPagination.pageSize, selectedPosition.id);
+                const updatedRecords = []; // Создаем массив для обновленных записей
+    
+                for (const row of response.rows) {
+                    try {
+                        const response2 = await fetchExtractRecords(null, null, null, {recordsId: [row.id]});
+                        let sum = 0;
+                        for (const item of response2.rows) {
+                            sum += item.quantity * item.quantity_um;
+                        }
+                        const leftValue = row.quantity - sum / row.quantity_um;
+                        const updatedRow = {...row, left: parseFloat(leftValue.toFixed(2))}; // Добавляем поле left в объект
+                        updatedRecords.push(updatedRow);
+                    } catch (error) {
+                        console.error('Error fetching extract records:', error);
+                        // Обработка ошибки при запросе extract records
+                    }
+                }
+                
                 setTotalResponse(prevState => [prevState[0], response.count]);
-                setRecords(response.rows);
+                setRecords(updatedRecords); // Устанавливаем обновленные записи
                 showRecordModal();
             } catch (error) {
                 console.error('Error fetching records:', error);
-                // Обработка ошибки
+                // Обработка ошибки при запросе records
             }
         },
         [recordPagination, selectedPosition]
-    );
+    );    
 
     // useEffect для обновления содержимого модальных окон при изменении пагинации
     useEffect(() => {

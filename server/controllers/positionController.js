@@ -180,7 +180,7 @@ class PositionController {
             if (factory) {
                 position.factory = factory;
             }
-            if (quantity) {
+            if (quantity || quantity === 0) {
                 position.quantity = quantity;
             }
             if (umId) {

@@ -4,103 +4,82 @@ import 'xlsx-js-style';
 import { useTranslation } from 'react-i18next';
 import { fetchOneExtract } from '../../http/extractsAPI';
 import { fetchExtractRecords } from '../../http/extractRecordsAPI';
+import { fetchOneRecord } from '../../http/recordsAPI';
 import { Button } from '../common/index';
 
 const ExcelGenerator = ({ id }) => {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
 
-    const generateStyle = (font, alignment) => {
-        const style = {};
-        // Проверяем наличие объекта font и добавляем его свойства в стиль
-        if (font) {
-            style.font = font;
-        }
-        // Проверяем наличие объекта alignment и добавляем его свойства в стиль
-        if (alignment) {
-            style.alignment = alignment;
-        }
-        return style;
-    };
-
     const generateExcel = async () => {
         try {
             setLoading(true);
             const response1 = await fetchOneExtract(id);
-            const response2 = await fetchExtractRecords(null, null, id)
-
-            XLSX = require('xlsx-js-style');
+            const response2 = await fetchExtractRecords(null, null, id);
+    
             // Создаем новую книгу
             const wb = XLSX.utils.book_new();
-
+    
             // Формируем данные для первого листа
             const data1 = [
                 ["Данные по выписке #", "", response1.id],
                 ["Дата выписки (от):", "", response1.date],
                 ["Создана работником:", "", response1.user.name],
+                [""],
                 ["Записи из выписки", "", "", "", "", "", "", ""],
-                ["Номер", "Описание склада", "Описание поставки", "Количество", "Ед.Изм.(Выписки)", "Ед.Изм.(Поставки)", "Коэф-нт Позиции", "Проект"]
+                ["Номер", "Описание склада", "Описание поставки", "Количество", "Ед.Изм.", "Проект"]
             ];
-
-            response2.rows.forEach((row, index) => {
-                data1.push([
-                    index + 1,
+    
+            // Обработка каждой строки из response2.rows
+            for (let row of response2.rows) {
+                const record = await fetchOneRecord(row.recordId);
+                const record_umName = record.um.name;
+                const quantity_R = row.quantity * row.quantity_um / record.quantity_um;
+                
+                // Добавляем поля в объект row
+                row.record_umName = record_umName;
+                row.quantity_R = quantity_R;
+                
+                // Формируем данные для текущей строки
+                const rowData = [
+                    response2.rows.indexOf(row) + 1,
                     row.record.position.desc,
                     row.record.desc_fact,
-                    row.quantity,
-                    row.um.name,
-                    row.record.um.name,
-                    row.quantity_um,
+                    row.quantity_R,
+                    row.record_umName,
                     row.project
-                ]);
-            });
-
+                ];
+                
+                // Добавляем текущую строку в данные
+                data1.push(rowData);
+            }
+    
             // Создаем лист
             const ws1 = XLSX.utils.aoa_to_sheet(data1);
-
-            // Стили
-            ws1["A1"].s = generateStyle({ bold: true }, { horizontal: "center" });
-            ws1["C1"].s = generateStyle(null, { horizontal: "center" });
-            ws1["A2"].s = generateStyle(null,{horizontal: "right"})
-            ws1["C2"].s = generateStyle(null, {horizontal: "left"})
-            ws1["C2"].t = 'd';
-            ws1["A3"].s = generateStyle(null,{horizontal: "right"})
-            ws1["C3"].s = generateStyle({ italic: true }, null)
-            ws1["A4"].s = generateStyle(null, { horizontal: "center" })
-            Object.keys(ws1).forEach(cell => {
-                if (cell.includes('5')) {
-                    ws1[cell].s = generateStyle({ bold: true }, { horizontal: "center" }); // Замените yourStyle на ваш объект стиля
-                }
-            });
-            Object.keys(ws1).forEach(cell => {
-                if (parseInt(cell[1]) >= 6) {
-                    ws1[cell].s = generateStyle(null, { horizontal: "center" }); // Применяем стиль к клеткам ниже или равно 5ой строке
-                }
-            });
-
+    
             // Объединение ячеек A1, B1, C1
             ws1['!merges'] = [
                 { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }, 
                 { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
                 { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
-                { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
+                { s: { r: 4, c: 0 }, e: { r: 4, c: 5 } },
             ];
 
             // Устанавливаем ширину столбцов
             ws1['!cols'] = [
                 { width: 15 }, 
-                { width: 20 },
-                { width: 20 }, 
+                { width: 30 },
+                { width: 30 }, 
                 { width: 20 }, 
                 { width: 20 }, 
                 { width: 20 }, 
                 { width: 20 }, 
                 { width: 20 }
             ];
-
+    
             // Добавляем лист к книге
             XLSX.utils.book_append_sheet(wb, ws1, "Информация о выписке");
-
+    
             // Сохраняем книгу в файл
             XLSX.writeFile(wb, "отчёт_выписки_" + response1.id + ".xlsx");
         } catch (error) {
@@ -108,7 +87,7 @@ const ExcelGenerator = ({ id }) => {
         } finally {
             setLoading(false);
         }
-    };
+    };    
 
     return (
         <Button onClick={generateExcel} disabled={loading} text={loading ? t("extractPage.genExcelLoading") : t("extractPage.genExcel")}/>

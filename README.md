@@ -33,64 +33,71 @@ Development of software for optimization of inventory accounting of equipment at
 - **JWT Token Handling:** jwt-decode
 
 ## Installation and Running
+# Project Installation Using Docker Compose
 
-### Client
+This project utilizes Docker Compose to manage containers and dependencies. Docker Compose facilitates easy building and running of multi-container applications using simple configuration files.
 
-**First Run**
+## Requirements
 
-1. **Clone the repository:**
+Before starting the installation, make sure you have the following programs installed:
+
+- Docker: [Docker Installation Instructions](https://docs.docker.com/get-docker/)
+- Docker Compose: [Docker Compose Installation Instructions](https://docs.docker.com/compose/install/)
+
+## Installation
+
+1. Clone the repository:
+
     ```bash
-    git clone <URL>
+    git clone <REPOSITORY_URL>
+    cd <FOLDER_NAME>
     ```
 
-2. **Build Docker container:**
-    In the `client` directory:
-    ```bash
-    cd client
-    docker build -t client .
+2. Open the `docker-compose.yaml` file in the project's root directory and specify the necessary environment variables in the `environment` section for the `db` service. Example:
+
+    ```yaml
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: mydatabase
     ```
-    
-**Subsequently**
-    
-1. **Run the Docker container:**
-    Notice `REACT_APP_API_URL` declaring an environment variable to determine the ip of the server computer:
-    ```bash
-    docker run -e API_URL='http://<server-local-ip>:5000/' -p 80:80 -d client
+
+3. Create a `.env` file in the `server` directory with the following variables for JWT tokens:
+
+    ```plaintext
+    ACCESS_TOKEN_SECRET=
+    REFRESH_TOKEN_SECRET=
     ```
-    Replace `<server-local-ip>` with the local IP address of your server.
 
-**Notice**
+4. Start Docker Compose:
 
-1. If you do not specify an environment variable for the `ip server` when launching the container yourself, the default variable from .env will be = `http://localhost:5000/`.
-2. Please note that when using Chrome browsers as a working environment, you may need to extend eliminates the CORS restrictions imposed by your browser.
-    
-### Server
-
-**First Run**
-
-1. **Clone the repository:**
     ```bash
-    git clone <URL>
+    docker-compose up
     ```
-    
-2. **Install dependencies:**
-    In the `server` directory:
-    ```bash
-    cd server
-    npm install
-    ```
-    
-3. **Install dependencies:**
-    Ensure PostgreSQL is installed and running on your system.
 
-**After installation**
+5. After successfully starting the containers, the application will be available at the following addresses:
+   - Client application: [http://localhost:3000](http://localhost:3000)
+   - Server application: [http://localhost:5000](http://localhost:5000)
 
-1. **Running the application:**
-    In the `server` directory:
-    ```bash
-    npm run dev
-    ```
-    This command will start the server and connect to the PostgreSQL database.
+## Initial Setup
+
+Upon installation, a default superadmin account is automatically created with the following credentials:
+   - **Login:** user1
+   - **Password:** 1111
+
+Please note that this is a basic admin account provided for initial access to the system. It is strongly recommended to remove this user for security purposes after gaining access to the system.
+
+## Stopping
+
+To stop the containers, execute the following command in the project's root directory:
+
+```bash
+docker-compose down
+```
+
+## Additional Information
+
+For more detailed information on setup and configuration of the project, refer to the respective documentation or contact the project developers.
 
 ## DataBase schema
 

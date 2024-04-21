@@ -18,6 +18,7 @@ const start = async() => {
         await sequelize.authenticate()
         await sequelize.sync()
         app.listen(PORT,()=>console.log(`Server started on PORT ${PORT}`))
+        await models.User.addDefaultAdmin(); 
     } catch (error) {
         console.error(error)
     }

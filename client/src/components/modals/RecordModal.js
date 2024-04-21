@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Modal, List, Empty, Button, Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
@@ -23,7 +23,7 @@ const RecordModal = ({ visible, records, onSelectRecord, onCancel, pagination, o
                             <List.Item key={item.id}>
                                 <List.Item.Meta
                                     title={<span>{((pagination.current - 1) * pagination.pageSize) + index + 1}. {item.desc_fact}</span>}
-                                    description={`${t("table-columns.quantity")}: ${item.quantity} ${item.um.name} `}
+                                    description={`${t("table-columns.quantity")}: ${item.quantity} ${item.um.name} ${t("extractConstructor.left")}: ${item.left} ${item.um.name}`}
                                 />
                                 <Button type="primary" icon={<PlusOutlined />} onClick={() => onSelectRecord(item)} />
                             </List.Item>

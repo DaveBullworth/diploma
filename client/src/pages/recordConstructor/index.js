@@ -8,6 +8,7 @@ import { Button, Spin, notification } from '../../components/common/index';
 import { fetchUMs, createUM } from '../../http/umAPI';
 import { createRecord, fetchOneRecord, editRecord } from '../../http/recordsAPI';
 import { fetchOnePosition, editPosition } from '../../http/positionsAPI';
+import { fetchExtractRecords } from '../../http/extractRecordsAPI';
 import dayjs from 'dayjs'; // Import dayjs library
 import './style.scss';
 
@@ -25,6 +26,7 @@ const RecordConstructor = ({update}) => {
     const [copyFromPrevious, setCopyFromPrevious] = useState(false);
     const [recordIndex, setRecordIndex] = useState(null);
     const [positionData, setPositionData] = useState({
+        quantity: 0,
         um: {
             name: ''
         }
@@ -81,6 +83,12 @@ const RecordConstructor = ({update}) => {
             let totalQuantity = 0; // Сумма произведений quantity * quantity_um
             let newQuantity = positionData.quantity;
             if (update) {
+                const response = await fetchExtractRecords(null, null, null, { recordsId: [id] });
+                const totalExistingQuantity = response.rows.reduce((acc, row) => acc + (row.quantity * row.quantity_um), 0);
+                // Проверка условия
+                if (formDataArray[0].quantity * formDataArray[0].quantity_um < totalExistingQuantity) {
+                    throw new Error(t("recordConstructor.errTitle2"));
+                }
                 const record = await fetchOneRecord(id)
                 const oldQuantity = record.quantity*record.quantity_um
                 newQuantity -= oldQuantity
@@ -107,6 +115,7 @@ const RecordConstructor = ({update}) => {
             }));
 
             newQuantity += totalQuantity
+
             // Вызов функции редактирования позиции с новыми данными
             await editPosition(positionData.id, {quantity: newQuantity});
 

@@ -194,7 +194,8 @@
         "addRec" : "Another record",
         "backToPos" : "Return to position",
         "remRec" : "Remove record",
-        "errTitle" : "Empty record fields were found"
+        "errTitle" : "Empty record fields were found",
+        "errTitle2" : "An attempt to assign a record a quantity less than has already been written out."
     },
     "categoryPage" : {
         "title" : "Category Menu",

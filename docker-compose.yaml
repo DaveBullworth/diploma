@@ -1,0 +1,27 @@
+version: "3"
+services:
+  server:
+    build: ./server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    container_name: storage-server
+  client:
+    build: ./client
+    ports:
+      - "3000:80"
+    container_name: storage-client
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1357908642
+      POSTGRES_DB: Storage
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    container_name: storage-db
+volumes:
+  postgres_data:

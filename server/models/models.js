@@ -1,5 +1,6 @@
 const sequelize = require('../db')
 const {DataTypes} = require('sequelize')
+const bcrypt = require('bcrypt')
 
 //пользователь
 const User = sequelize.define('user', {
@@ -10,6 +11,21 @@ const User = sequelize.define('user', {
     active: {type: DataTypes.BOOLEAN, allowNull:false, defaultValue: true}, // добавлено поле active
     admin: {type: DataTypes.BOOLEAN, allowNull:false, defaultValue: false} // добавлено поле admin
 })
+
+// Добавляем метод для создания записи пользователя только если в таблице нет других записей с admin=true и active=true
+User.addDefaultAdmin = async () => {
+    const existingAdmin = await User.findOne({ where: { admin: true, active: true } });
+    if (!existingAdmin) {
+        const hashPassword = await bcrypt.hash('1111',3)
+        await User.create({
+            login: 'user1',
+            password: hashPassword,
+            name: 'Сааков Андрей Валерьевич',
+            active: true,
+            admin: true
+        });
+    }
+};
 
 //выписка
 const Extract = sequelize.define('extract', {

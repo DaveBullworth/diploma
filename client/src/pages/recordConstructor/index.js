@@ -119,6 +119,12 @@ const RecordConstructor = ({update}) => {
             // Вызов функции редактирования позиции с новыми данными
             await editPosition(positionData.id, {quantity: newQuantity});
 
+            // Обновление состояния positionData с новым значением quantity
+            setPositionData(prevPositionData => ({
+                ...prevPositionData,
+                quantity: newQuantity
+            }));
+
             // Очистить поля после успешной отправки
             if (!update) setFormDataArray([{
                 desc_fact: '',

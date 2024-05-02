@@ -96,7 +96,7 @@ const RecordConstructor = ({update}) => {
             await Promise.all(formDataArray.map(async (formData) => {
                 const data = {
                     ...formData,
-                    date: formData.date.format('YYYY-MM-DD HH:mm:ss'), // Format date before sending
+                    date: formData.date,
                     positionId: id
                 };
                 let foundUM = ums.find(um => um.name === formData.um);

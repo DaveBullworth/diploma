@@ -578,7 +578,7 @@ const ExtractConstructor = ({update}) => {
             notification({
                 type: 'error',
                 message:  t("notification.error"),
-                description: t("notification.errorDesc10") + (update ? t("extractConstructor.mod__") : t("extractConstructor.edit__")) + t("extractConstructor.extract"),
+                description: t("notification.errorDesc10") + " " + (update ? t("extractConstructor.mod__") : t("extractConstructor.create__")) + " " + t("extractConstructor.extract"),
             });
         }
     }    

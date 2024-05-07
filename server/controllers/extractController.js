@@ -81,7 +81,8 @@ class ExtractController {
                 limit, 
                 offset,
             })
-            return res.json({ count: extract.rows.length, rows: extract.rows })
+            const { count } = await Extract.findAndCountAll({ where: whereClause });
+            return res.json({ count: count, rows: extract.rows })
         } catch (error) {
             next(ApiError.badRequest(error.message))
         }

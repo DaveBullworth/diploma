@@ -1,6 +1,6 @@
 class ApiError extends Error {
     constructor(status,message){
-        super();//вызвали родительский конструктор
+        super(); //вызвали родительский конструктор
         this.status = status;
         this.message = message;
     }

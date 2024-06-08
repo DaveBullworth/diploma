@@ -1,6 +1,6 @@
 const { Extract, ExtractRecord, User } = require("../models/models")
 const { Op } = require('sequelize');
-const ApiError = require('../error/apiError')
+const ApiError = require('../error/ApiError')
 
 class ExtractController {
     async create(req, res, next) {

@@ -293,8 +293,7 @@ const OrderConstructor = ({update}) => {
                             formData.positionId === row.positionId &&
                             formData.quantity === row.quantity
                         ) {
-                            const rep = await editOrderRecord(row.id, {active: formData.active})
-                            console.log(rep)
+                            await editOrderRecord(row.id, {active: formData.active})
                             foundMatchingRecord = true;
                             break;
                         }

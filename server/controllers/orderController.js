@@ -1,6 +1,6 @@
 const { Order, OrderRecord } = require("../models/models")
 const { Op } = require('sequelize');
-const ApiError = require('../error/apiError')
+const ApiError = require('../error/ApiError')
 
 class OrderController {
     async create(req, res, next) {

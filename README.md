@@ -62,9 +62,10 @@ Before starting the installation, make sure you have the following programs inst
       POSTGRES_DB: mydatabase
     ```
 
-3. Create a `.env` file in the `server` directory with the following variables for JWT tokens:
+3. Create a `.env` file in the `server` directory with the following variables for DB-connection and JWT tokens:
 
     ```plaintext
+    DB_HOST=
     ACCESS_TOKEN_SECRET=
     REFRESH_TOKEN_SECRET=
     ```

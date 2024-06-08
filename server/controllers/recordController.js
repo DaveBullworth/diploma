@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
 const {Record, UM} = require('../models/models')
-const ApiError = require('../error/apiError')
+const ApiError = require('../error/ApiError')
 
 class RecordController {
     async create(req, res, next) {

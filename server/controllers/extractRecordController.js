@@ -1,5 +1,5 @@
 const { ExtractRecord, Record, Position, User, Extract, UM } = require("../models/models")
-const ApiError = require('../error/apiError')
+const ApiError = require('../error/ApiError')
 const { Op } = require('sequelize');
 
 class ExtractRecordController {
@@ -60,19 +60,22 @@ class ExtractRecordController {
         page = page || 1;
         limit = limit || 5;
         let offset = page * limit - limit;
+    
         try {
-            let whereClause = {}; // Создаем пустой объект для условий поиска
-            let orderCriteria = []; // Создаем пустой массив для критериев сортировки
-
+            let whereClause = {}; // Create an empty object for search conditions
+            let orderCriteria = []; // Create an empty array for sorting criteria
+            let recordsIdPresent = false;
+    
             if (extractId) {
-                whereClause.extractId = extractId; // Если positionId передан, добавляем его в фильтр
+                whereClause.extractId = extractId; // If extractId is passed, add it to the filter
             }
-            
+    
             if (filters) {
-                filters = JSON.parse(filters); // Парсим строку JSON
+                filters = JSON.parse(filters); // Parse the JSON string
                 for (let key in filters) {
-                    if (key === 'recordsId' ) {
+                    if (key === 'recordsId') {
                         whereClause.recordId = { [Op.in]: filters.recordsId };
+                        recordsIdPresent = true; // Mark that recordsId is present in filters
                     } else if (key === 'umId') {
                         whereClause[key] = { [Op.eq]: filters[key] };
                     } else {
@@ -80,8 +83,9 @@ class ExtractRecordController {
                     }
                 }
             }
+    
             if (!sort || Object.keys(sort).length === 0) {
-                // Если sort не задан или пустой, устанавливаем сортировку по убыванию id по умолчанию
+                // If sort is not specified or empty, set default sorting by ascending id
                 orderCriteria.push(['id', 'ASC']);
             } else {
                 sort = JSON.parse(sort);
@@ -91,7 +95,8 @@ class ExtractRecordController {
                     }
                 }
             }
-            const extractRecord = await ExtractRecord.findAndCountAll({
+    
+            let queryOptions = {
                 include: [
                     {
                         model: UM,
@@ -124,14 +129,19 @@ class ExtractRecordController {
                 ],
                 where: whereClause,
                 order: orderCriteria,
-                limit,
-                offset
-            });
-            return res.json(extractRecord)
+            };
+    
+            if (!recordsIdPresent) {
+                queryOptions.limit = limit;
+                queryOptions.offset = offset;
+            }
+    
+            const extractRecord = await ExtractRecord.findAndCountAll(queryOptions);
+            return res.json(extractRecord);
         } catch (error) {
-            next(ApiError.badRequest(error.message))
+            next(ApiError.badRequest(error.message));
         }
-    }
+    }    
 
     async delete(req, res, next) {
         const { id } = req.params;

@@ -1,7 +1,7 @@
 const { Position, Record, Category, UM } = require("../models/models")
 const { Op } = require('sequelize');
 const sequelize = require('../db');
-const ApiError = require('../error/apiError')
+const ApiError = require('../error/ApiError')
 
 class PositionController {
     async create(req, res, next) {

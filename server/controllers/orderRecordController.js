@@ -1,5 +1,5 @@
 const { OrderRecord, Position, UM} = require("../models/models")
-const ApiError = require('../error/apiError')
+const ApiError = require('../error/ApiError')
 const { Op } = require('sequelize');
 
 class OrderRecordController {
@@ -47,26 +47,31 @@ class OrderRecordController {
         page = page || 1;
         limit = limit || 5;
         let offset = page * limit - limit;
+    
         try {
-            let whereClause = {}; // Создаем пустой объект для условий поиска
-            let orderCriteria = []; // Создаем пустой массив для критериев сортировки
-
+            let whereClause = {}; // Create an empty object for search conditions
+            let orderCriteria = []; // Create an empty array for sorting criteria
+    
             if (orderId) {
-                whereClause.orderId = orderId; // Если positionId передан, добавляем его в фильтр
+                whereClause.orderId = orderId; // If orderId is passed, add it to the filter
             }
-            
+    
+            let positionsIdPresent = false;
+    
             if (filters) {
-                filters = JSON.parse(filters); // Парсим строку JSON
+                filters = JSON.parse(filters); // Parse the JSON string
                 for (let key in filters) {
-                    if (key === 'positionsId' ) {
+                    if (key === 'positionsId') {
                         whereClause.positionId = { [Op.in]: filters.positionsId };
+                        positionsIdPresent = true; // Mark that positionsId is present in filters
                     } else {
                         whereClause[key] = { [Op.like]: `%${filters[key]}%` };
                     }
                 }
             }
+    
             if (!sort || Object.keys(sort).length === 0) {
-                // Если sort не задан или пустой, устанавливаем сортировку по убыванию id по умолчанию
+                // If sort is not specified or empty, set default sorting by descending id
                 orderCriteria.push(['id', 'ASC']);
             } else {
                 sort = JSON.parse(sort);
@@ -79,7 +84,8 @@ class OrderRecordController {
                     }
                 }
             }
-            const orderRecord = await OrderRecord.findAndCountAll({
+    
+            let queryOptions = {
                 include: [
                     {
                         model: Position,
@@ -95,14 +101,19 @@ class OrderRecordController {
                 ],
                 where: whereClause,
                 order: orderCriteria,
-                limit,
-                offset
-            });
-            return res.json(orderRecord)
+            };
+    
+            if (!positionsIdPresent) {
+                queryOptions.limit = limit;
+                queryOptions.offset = offset;
+            }
+    
+            const orderRecord = await OrderRecord.findAndCountAll(queryOptions);
+            return res.json(orderRecord);
         } catch (error) {
-            next(ApiError.badRequest(error.message))
+            next(ApiError.badRequest(error.message));
         }
-    }
+    }    
 
     async delete(req, res, next) {
         const { id } = req.params;

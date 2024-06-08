@@ -1,5 +1,5 @@
 const { PositionHierarchy } = require("../models/models");
-const ApiError = require('../error/apiError');
+const ApiError = require('../error/ApiError');
 
 class PositionHierarchyController {
     async create(req, res, next) {
